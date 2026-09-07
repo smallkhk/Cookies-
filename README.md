@@ -16,21 +16,48 @@ Python 3.8+ required.
 
 ## Steps
 
-### On your SOURCE PC
+### Option A — LAN Transfer (both PCs on same Wi-Fi/router)
 
-1. **Close all browser windows** (Chrome, Edge, Firefox).
+**Source PC:**
+1. Close all browser windows.
+2. Run:
+   ```
+   python serve_cookies.py
+   ```
+3. It exports cookies, then prints your LAN IP and a one-time PIN, e.g.:
+   ```
+   Listening on:  http://192.168.1.42:9876
+   One-time PIN:  A3F9C12B
+
+   On your SECOND PC run:
+     python receive_cookies.py 192.168.1.42 A3F9C12B
+   ```
+4. Leave it running until the transfer completes — it shuts itself down automatically.
+
+**Target PC:**
+1. Close all browser windows.
+2. Run the command shown on the source PC:
+   ```
+   python receive_cookies.py 192.168.1.42 A3F9C12B
+   ```
+3. Open your browsers — you should be logged in everywhere.
+
+> The server only accepts one request (one-time PIN), then shuts down. Only reachable on your local network.
+
+---
+
+### Option B — Manual (USB / shared folder)
+
+**Source PC:**
+1. Close all browser windows.
 2. Run:
    ```
    python export_cookies.py
    ```
-3. This creates `cookies_export.json` in the same folder.
-4. Copy `cookies_export.json` to your second PC (USB drive, shared folder, etc.).
+3. Copy `cookies_export.json` to your second PC.
 
----
-
-### On your TARGET (second) PC
-
-1. **Close all browser windows**.
+**Target PC:**
+1. Close all browser windows.
 2. Put `cookies_export.json` and `import_cookies.py` in the same folder.
 3. Run:
    ```
