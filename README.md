@@ -18,31 +18,50 @@ Python 3.8+ required.
 
 ### Option A — LAN Transfer (both PCs on same Wi-Fi/router)
 
+#### One-shot
+
 **Source PC:**
 1. Close all browser windows.
 2. Run:
    ```
-   python serve_cookies.py
+   python serve_cookies.py --password mypass
    ```
-3. It exports cookies, then prints your LAN IP and a one-time PIN, e.g.:
+3. It prints your LAN IP and the command to run on PC 2, e.g.:
    ```
    Listening on:  http://192.168.1.42:9876
-   One-time PIN:  A3F9C12B
+   Password:      mypass
 
    On your SECOND PC run:
-     python receive_cookies.py 192.168.1.42 A3F9C12B
+     python receive_cookies.py 192.168.1.42 --password mypass
    ```
-4. Leave it running until the transfer completes — it shuts itself down automatically.
 
 **Target PC:**
 1. Close all browser windows.
 2. Run the command shown on the source PC:
    ```
-   python receive_cookies.py 192.168.1.42 A3F9C12B
+   python receive_cookies.py 192.168.1.42 --password mypass
    ```
 3. Open your browsers — you should be logged in everywhere.
 
-> The server only accepts one request (one-time PIN), then shuts down. Only reachable on your local network.
+---
+
+#### Auto-refresh (keeps cookies in sync automatically)
+
+Run both with `--refresh <minutes>` using the **same interval**:
+
+**Source PC:**
+```
+python serve_cookies.py --password mypass --refresh 30
+```
+
+**Target PC:**
+```
+python receive_cookies.py 192.168.1.42 --password mypass --refresh 30
+```
+
+Both loop indefinitely. Every 30 minutes the source re-exports fresh cookies and the receiver re-imports them. Press `Ctrl-C` on either side to stop.
+
+> Only reachable on your local network — the receiver rejects any non-private IP.
 
 ---
 

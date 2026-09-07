@@ -1,40 +1,48 @@
 """
 serve_cookies.py  —  Run on your SOURCE Windows PC
-Exports cookies then serves them once over LAN with a one-time PIN.
+Exports cookies then serves them over LAN with a shared password.
 
-Usage:
-    python serve_cookies.py
-    -> shows your LAN IP + PIN; run receive_cookies.py on the second PC
+Usage (one-shot):
+    python serve_cookies.py --password mypass
+
+Usage (auto-refresh every 30 minutes):
+    python serve_cookies.py --password mypass --refresh 30
+
+The receiver must use the same password.
 """
 
-import os
+import argparse
+import importlib.util
 import json
-import secrets
 import socket
+import sys
+import time
 import threading
-import webbrowser
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
 from urllib.parse import urlparse, parse_qs
 
-# ── Run the export first ───────────────────────────────────────────────────────
+PORT = 9876
+EXPORT_FILE = Path("cookies_export.json")
+
+# Shared state — reset each round
+_ready = threading.Event()   # set when export file is ready
+_served = threading.Event()  # set once file is sent this round
+_password: str = ""
+
+
+# ── Export ────────────────────────────────────────────────────────────────────
 
 def run_export():
-    print("=" * 55)
-    print("  COOKIE EXPORTER  —  LAN Transfer Mode")
-    print("=" * 55)
-
-    # Lazy-import the export logic from export_cookies.py
-    import importlib.util, sys
     spec = importlib.util.spec_from_file_location(
         "export_cookies", Path(__file__).parent / "export_cookies.py"
     )
-    mod = importlib.util.load_from_spec(spec)
+    mod = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(mod)
     mod.main()
 
 
-# ── Discover LAN IP ────────────────────────────────────────────────────────────
+# ── LAN IP ────────────────────────────────────────────────────────────────────
 
 def get_lan_ip() -> str:
     try:
@@ -47,34 +55,29 @@ def get_lan_ip() -> str:
         return "127.0.0.1"
 
 
-# ── One-shot HTTP server ───────────────────────────────────────────────────────
-
-SERVED = threading.Event()
-PIN: str = ""
-EXPORT_FILE = Path("cookies_export.json")
-
+# ── HTTP handler ──────────────────────────────────────────────────────────────
 
 class Handler(BaseHTTPRequestHandler):
     def log_message(self, fmt, *args):
-        pass  # suppress default access log; we print our own
+        pass
 
     def do_GET(self):
         parsed = urlparse(self.path)
         qs = parse_qs(parsed.query)
-        provided_pin = qs.get("pin", [""])[0]
+        provided = qs.get("password", [""])[0]
 
-        if parsed.path != "/cookies" or provided_pin != PIN:
+        if parsed.path != "/cookies" or provided != _password:
             self.send_response(403)
             self.end_headers()
-            self.wfile.write(b"Wrong PIN or path.")
-            client = self.client_address[0]
-            print(f"  [!] Rejected connection from {client} (bad PIN)")
+            self.wfile.write(b"Wrong password.")
+            print(f"  [!] Rejected {self.client_address[0]} (bad password)")
             return
 
-        if SERVED.is_set():
-            self.send_response(410)
+        # Wait up to 30 s for the export to finish (handles race on startup)
+        if not _ready.wait(timeout=30):
+            self.send_response(503)
             self.end_headers()
-            self.wfile.write(b"File already served. Start again to transfer again.")
+            self.wfile.write(b"Export not ready yet, try again in a moment.")
             return
 
         data = EXPORT_FILE.read_bytes()
@@ -84,41 +87,85 @@ class Handler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(data)
 
-        client = self.client_address[0]
-        print(f"\n  [OK] File sent to {client}")
-        print("  Server shutting down — transfer complete.")
-        SERVED.set()
+        print(f"  [OK] Cookies sent to {self.client_address[0]}")
+        _served.set()
 
-        # Shut down server after response is sent
-        t = threading.Thread(target=self.server.shutdown, daemon=True)
+
+# ── One round: export → serve → (optionally) wait ─────────────────────────────
+
+def run_round(lan_ip: str, server: HTTPServer, refresh_mins: int, round_num: int):
+    global _ready, _served
+
+    _ready = threading.Event()
+    _served = threading.Event()
+
+    banner = f"Round {round_num}" if refresh_mins else "Transfer"
+    print(f"\n{'=' * 55}")
+    print(f"  {banner}  —  exporting cookies...")
+    print(f"{'=' * 55}")
+
+    run_export()
+    _ready.set()
+
+    print(f"\n  Listening on:  http://{lan_ip}:{PORT}")
+    print(f"  Password:      {_password}")
+    if refresh_mins:
+        print(f"  Auto-refresh:  every {refresh_mins} min")
+    print(f"\n  On your SECOND PC run:")
+    cmd = f"python receive_cookies.py {lan_ip} --password {_password}"
+    if refresh_mins:
+        cmd += f" --refresh {refresh_mins}"
+    print(f"    {cmd}")
+    print(f"\n  Waiting for receiver... (Ctrl-C to stop)\n")
+
+    if refresh_mins:
+        # In refresh mode: serve the file to as many requests as come in
+        # during this window, then move on to the next round.
+        _served.wait(timeout=refresh_mins * 60)
+    else:
+        # One-shot: wait until served, then shut down.
+        _served.wait()
+        t = threading.Thread(target=server.shutdown, daemon=True)
         t.start()
 
 
-def serve(port: int = 9876) -> None:
-    lan_ip = get_lan_ip()
-    server = HTTPServer((lan_ip, port), Handler)
-
-    print("\n" + "=" * 55)
-    print(f"  Listening on:  http://{lan_ip}:{port}")
-    print(f"  One-time PIN:  {PIN}")
-    print("=" * 55)
-    print("\n  On your SECOND PC run:")
-    print(f"    python receive_cookies.py {lan_ip} {PIN}")
-    print("\n  Waiting for connection... (Ctrl-C to cancel)\n")
-
-    server.serve_forever()
-
-
-# ── Main ───────────────────────────────────────────────────────────────────────
+# ── Main ──────────────────────────────────────────────────────────────────────
 
 def main():
-    global PIN
-    PIN = secrets.token_hex(4).upper()  # e.g. "A3F9C12B"
+    global _password
 
-    run_export()
-    serve()
+    parser = argparse.ArgumentParser(description="Serve browser cookies over LAN")
+    parser.add_argument("--password", required=True, help="Shared password (same on both PCs)")
+    parser.add_argument(
+        "--refresh",
+        type=int,
+        default=0,
+        metavar="MINUTES",
+        help="Re-export and re-serve every N minutes (omit for one-shot)",
+    )
+    args = parser.parse_args()
 
-    print("\nDone.")
+    _password = args.password
+    refresh_mins = args.refresh
+
+    lan_ip = get_lan_ip()
+    server = HTTPServer((lan_ip, PORT), Handler)
+    server_thread = threading.Thread(target=server.serve_forever, daemon=True)
+    server_thread.start()
+
+    round_num = 1
+    try:
+        while True:
+            run_round(lan_ip, server, refresh_mins, round_num)
+            if not refresh_mins:
+                break
+            print(f"\n  Next refresh in {refresh_mins} min — press Ctrl-C to stop.")
+            time.sleep(refresh_mins * 60)
+            round_num += 1
+    except KeyboardInterrupt:
+        print("\n\nStopped.")
+    finally:
+        server.shutdown()
 
 
 if __name__ == "__main__":
