@@ -1,0 +1,1128 @@
+<title>CookieSync</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Inter:wght@400;500;600&display=swap">
+
+<style>
+  /* ── Tokens ── */
+  :root {
+    --bg:         #0B0F1A;
+    --surface:    #141924;
+    --surface-2:  #1A2133;
+    --border:     #1E2740;
+    --border-2:   #2A3554;
+    --accent:     #00C896;
+    --accent-dim: #009E76;
+    --accent-glow:#00C89630;
+    --red:        #FF5A6E;
+    --yellow:     #F5B731;
+    --txt:        #E2EAF8;
+    --txt-2:      #8A9DC0;
+    --txt-3:      #4E618A;
+    --code-bg:    #0D1420;
+    color-scheme: dark;
+  }
+
+  /* Light theme */
+  @media (prefers-color-scheme: light) {
+    :root:not([data-theme="dark"]) {
+      --bg:         #F0F4FB;
+      --surface:    #FFFFFF;
+      --surface-2:  #EAF0FB;
+      --border:     #D1DDF2;
+      --border-2:   #B8CAEB;
+      --accent:     #007A5A;
+      --accent-dim: #005E45;
+      --accent-glow:#007A5A20;
+      --red:        #D93444;
+      --yellow:     #B07D00;
+      --txt:        #0D1A33;
+      --txt-2:      #3D5480;
+      --txt-3:      #7A95C0;
+      --code-bg:    #E4EAF8;
+      color-scheme: light;
+    }
+  }
+  :root[data-theme="light"] {
+    --bg:         #F0F4FB;
+    --surface:    #FFFFFF;
+    --surface-2:  #EAF0FB;
+    --border:     #D1DDF2;
+    --border-2:   #B8CAEB;
+    --accent:     #007A5A;
+    --accent-dim: #005E45;
+    --accent-glow:#007A5A20;
+    --red:        #D93444;
+    --yellow:     #B07D00;
+    --txt:        #0D1A33;
+    --txt-2:      #3D5480;
+    --txt-3:      #7A95C0;
+    --code-bg:    #E4EAF8;
+    color-scheme: light;
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    padding-inline: 20px;
+    padding-block: 32px;
+    background: var(--bg);
+    color: var(--txt);
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+    min-height: 100%;
+  }
+
+  /* ── Layout ── */
+  .page { max-width: 980px; margin-inline: auto; }
+
+  /* ── Header ── */
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 48px;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .logo-icon {
+    width: 40px; height: 40px;
+    background: var(--accent-glow);
+    border: 1.5px solid var(--accent);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+  }
+  .logo-name {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--txt);
+    letter-spacing: -0.02em;
+  }
+  .logo-name span { color: var(--accent); }
+
+  .theme-btn {
+    background: var(--surface);
+    border: 1px solid var(--border-2);
+    border-radius: 8px;
+    padding: 7px 14px;
+    color: var(--txt-2);
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    cursor: pointer;
+    transition: border-color .15s, color .15s;
+  }
+  .theme-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* ── Mode tabs ── */
+  .tabs {
+    display: flex;
+    gap: 4px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 4px;
+    margin-bottom: 40px;
+    width: fit-content;
+  }
+  .tab {
+    padding: 9px 20px;
+    border-radius: 7px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    color: var(--txt-2);
+    transition: background .15s, color .15s;
+  }
+  .tab.active {
+    background: var(--accent);
+    color: #000;
+    font-weight: 600;
+  }
+  .tab:not(.active):hover { color: var(--txt); }
+
+  /* ── Section title ── */
+  .section-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 6px;
+  }
+  .section-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--txt);
+    margin: 0 0 8px;
+    text-wrap: balance;
+    letter-spacing: -0.02em;
+  }
+  .section-desc {
+    color: var(--txt-2);
+    font-size: 14px;
+    margin: 0 0 32px;
+  }
+
+  /* ── Transfer layout ── */
+  .transfer-grid {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 0;
+    align-items: start;
+    margin-bottom: 40px;
+  }
+  @media (max-width: 640px) {
+    .transfer-grid {
+      grid-template-columns: 1fr;
+    }
+    .arrow-col { display: none; }
+  }
+
+  /* ── Arrow connector ── */
+  .arrow-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 12px;
+    padding-top: 80px;
+  }
+  .arrow-track {
+    width: 2px;
+    height: 48px;
+    background: linear-gradient(to bottom, var(--accent), transparent);
+  }
+  .arrow-body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+  .arrow-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 8px var(--accent);
+  }
+  .arrow-line {
+    width: 2px;
+    flex: 1;
+    background: repeating-linear-gradient(
+      to bottom,
+      var(--accent) 0,
+      var(--accent) 6px,
+      transparent 6px,
+      transparent 14px
+    );
+    min-height: 60px;
+    animation: dash .8s linear infinite;
+  }
+  @keyframes dash {
+    from { background-position: 0 0; }
+    to   { background-position: 0 14px; }
+  }
+  .arrow-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--accent);
+    writing-mode: vertical-rl;
+    letter-spacing: .1em;
+    margin: 8px 0;
+  }
+  .arrow-head {
+    color: var(--accent);
+    font-size: 16px;
+    line-height: 1;
+  }
+  .arrow-track-bottom {
+    width: 2px;
+    height: 48px;
+    background: linear-gradient(to bottom, var(--accent), transparent);
+  }
+
+  /* ── PC card ── */
+  .pc-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+  }
+  .pc-card-header {
+    padding: 18px 22px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .pc-badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    padding: 3px 9px;
+    border-radius: 5px;
+    text-transform: uppercase;
+  }
+  .badge-source {
+    background: var(--accent-glow);
+    color: var(--accent);
+    border: 1px solid var(--accent);
+  }
+  .badge-target {
+    background: #1A2550;
+    color: #60A0FF;
+    border: 1px solid #2A4080;
+  }
+  .pc-name {
+    font-weight: 600;
+    font-size: 15px;
+    color: var(--txt);
+  }
+  .pc-sub {
+    font-size: 12px;
+    color: var(--txt-3);
+  }
+
+  .pc-card-body { padding: 20px 22px 24px; }
+
+  /* ── Steps ── */
+  .steps { display: flex; flex-direction: column; gap: 16px; }
+  .step {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+  }
+  .step-num {
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    background: var(--surface-2);
+    border: 1px solid var(--border-2);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--txt-2);
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .step-active .step-num {
+    background: var(--accent-glow);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+  .step-text {
+    font-size: 14px;
+    color: var(--txt-2);
+    line-height: 1.5;
+  }
+  .step-active .step-text { color: var(--txt); }
+  .step-title {
+    font-weight: 600;
+    color: var(--txt);
+    margin-bottom: 4px;
+    font-size: 14px;
+  }
+
+  /* ── Code block ── */
+  .code-wrap {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 14px;
+    margin-top: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    overflow-x: auto;
+  }
+  .code-wrap code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12.5px;
+    color: var(--txt);
+    white-space: nowrap;
+    flex: 1;
+  }
+  .copy-btn {
+    background: var(--surface-2);
+    border: 1px solid var(--border-2);
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--txt-2);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: border-color .15s, color .15s;
+    flex-shrink: 0;
+  }
+  .copy-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .copy-btn.copied { border-color: var(--accent); color: var(--accent); }
+
+  /* ── Inputs ── */
+  .input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin-top: 10px;
+  }
+  .input-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--txt-3);
+    letter-spacing: .08em;
+    text-transform: uppercase;
+  }
+  .input-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .text-input {
+    background: var(--code-bg);
+    border: 1px solid var(--border-2);
+    border-radius: 7px;
+    padding: 8px 12px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--txt);
+    min-width: 0;
+    flex: 1;
+    outline: none;
+    transition: border-color .15s;
+  }
+  .text-input:focus { border-color: var(--accent); }
+  .text-input::placeholder { color: var(--txt-3); }
+
+  /* ── Refresh toggle ── */
+  .refresh-bar {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px 22px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 40px;
+  }
+  .refresh-info { flex: 1; min-width: 0; }
+  .refresh-title {
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--txt);
+    margin-bottom: 2px;
+  }
+  .refresh-desc {
+    font-size: 13px;
+    color: var(--txt-2);
+  }
+  .refresh-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .toggle-wrap { display: flex; align-items: center; gap: 8px; }
+  .toggle {
+    width: 40px; height: 22px;
+    background: var(--border-2);
+    border-radius: 11px;
+    position: relative;
+    cursor: pointer;
+    border: none;
+    transition: background .2s;
+    flex-shrink: 0;
+  }
+  .toggle.on { background: var(--accent); }
+  .toggle::after {
+    content: '';
+    position: absolute;
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    background: #fff;
+    top: 3px; left: 3px;
+    transition: left .2s;
+  }
+  .toggle.on::after { left: 21px; }
+  .toggle-label { font-size: 13px; color: var(--txt-2); }
+
+  .interval-input {
+    background: var(--code-bg);
+    border: 1px solid var(--border-2);
+    border-radius: 7px;
+    padding: 6px 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--txt);
+    width: 64px;
+    outline: none;
+    transition: border-color .15s;
+    text-align: center;
+  }
+  .interval-input:focus { border-color: var(--accent); }
+  .interval-unit { font-size: 13px; color: var(--txt-2); }
+
+  /* ── How it works table ── */
+  .how-section {
+    margin-top: 0;
+  }
+  .table-wrap { overflow-x: auto; border-radius: 10px; border: 1px solid var(--border); }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13.5px;
+  }
+  thead {
+    background: var(--surface-2);
+  }
+  th {
+    padding: 11px 16px;
+    text-align: left;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--txt-2);
+    white-space: nowrap;
+    border-bottom: 1px solid var(--border);
+  }
+  td {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    color: var(--txt-2);
+    vertical-align: top;
+  }
+  tr:last-child td { border-bottom: none; }
+  tbody tr:hover td { background: var(--surface-2); }
+  td strong { color: var(--txt); font-weight: 600; }
+  .tag {
+    display: inline-block;
+    padding: 2px 7px;
+    border-radius: 4px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .tag-green { background: #00C89620; color: var(--accent); }
+  .tag-blue  { background: #2A4AFF20; color: #6090FF; }
+
+  /* ── Notes ── */
+  .notes {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 22px;
+    margin-top: 24px;
+  }
+  .notes-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--txt-3);
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+  .note-item {
+    display: flex;
+    gap: 10px;
+    font-size: 13px;
+    color: var(--txt-2);
+    margin-bottom: 8px;
+    line-height: 1.5;
+  }
+  .note-item:last-child { margin-bottom: 0; }
+  .note-dot {
+    color: var(--txt-3);
+    flex-shrink: 0;
+    font-family: 'JetBrains Mono', monospace;
+    margin-top: 1px;
+  }
+
+  /* ── Hidden sections ── */
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  /* ── Manual panel ── */
+  .manual-grid {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 0;
+    align-items: start;
+    margin-bottom: 40px;
+  }
+  @media (max-width: 640px) {
+    .manual-grid { grid-template-columns: 1fr; }
+    .manual-grid .arrow-col { display: none; }
+  }
+
+  /* ── Divider ── */
+  .section-divider {
+    height: 1px;
+    background: var(--border);
+    margin: 40px 0;
+  }
+
+  /* ── Footer ── */
+  .footer {
+    margin-top: 48px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .footer-txt {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--txt-3);
+  }
+  .footer-txt span { color: var(--accent); }
+
+  /* ── Notification toast ── */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--surface-2);
+    border: 1px solid var(--accent);
+    border-radius: 8px;
+    padding: 10px 18px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--accent);
+    transition: transform .25s ease;
+    z-index: 100;
+    white-space: nowrap;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* ── IP status indicator ── */
+  .ip-status {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .ip-status::before {
+    content: '●';
+    font-size: 8px;
+  }
+  .ip-valid { background: #00C89615; color: var(--accent); }
+  .ip-invalid { background: #FF5A6E15; color: var(--red); }
+  .ip-empty { background: var(--surface-2); color: var(--txt-3); }
+</style>
+
+<div class="page">
+
+  <!-- Header -->
+  <header class="header">
+    <div class="logo">
+      <div class="logo-icon">🍪</div>
+      <div>
+        <div class="logo-name">Cookie<span>Sync</span></div>
+        <div style="font-size:12px;color:var(--txt-3);font-family:'JetBrains Mono',monospace;">v2.0 · LAN transfer</div>
+      </div>
+    </div>
+    <button class="theme-btn" onclick="toggleTheme()" id="themeBtn">☀ Light</button>
+  </header>
+
+  <!-- Mode tabs -->
+  <div class="tabs" role="tablist">
+    <button class="tab active" onclick="switchTab('lan', this)" role="tab">⇄ LAN Transfer</button>
+    <button class="tab" onclick="switchTab('manual', this)" role="tab">📁 Manual (USB)</button>
+    <button class="tab" onclick="switchTab('how', this)" role="tab">ℹ How it works</button>
+  </div>
+
+  <!-- ═══ LAN Panel ═══ -->
+  <div class="panel active" id="panel-lan">
+
+    <p class="section-label">LAN Transfer Mode</p>
+    <h2 class="section-title">Sync cookies across your network</h2>
+    <p class="section-desc">Both PCs must be on the same Wi-Fi or router. Close all browser windows before running.</p>
+
+    <!-- Shared password + refresh controls -->
+    <div class="refresh-bar">
+      <div class="refresh-info">
+        <div class="refresh-title">Shared password</div>
+        <div class="refresh-desc">Both PCs use the same password. Choose anything — it never leaves your network.</div>
+      </div>
+      <div class="refresh-controls">
+        <div class="input-group" style="margin-top:0;flex-direction:row;align-items:center;gap:8px;">
+          <div class="input-label" style="white-space:nowrap">Password</div>
+          <input type="text" class="text-input" id="passwordInput" placeholder="mypass" value="mypass" style="width:120px;flex:none;" oninput="updateCommands()">
+        </div>
+        <div class="toggle-wrap">
+          <button class="toggle" id="refreshToggle" onclick="toggleRefresh()" aria-label="Toggle auto-refresh"></button>
+          <span class="toggle-label">Auto-refresh</span>
+        </div>
+        <div id="refreshControls" style="display:none;align-items:center;gap:6px;display:none;" class="toggle-wrap">
+          <span class="toggle-label">every</span>
+          <input type="number" class="interval-input" id="intervalInput" value="30" min="1" max="1440" oninput="updateCommands()">
+          <span class="interval-unit">min</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Transfer grid -->
+    <div class="transfer-grid">
+
+      <!-- Source PC -->
+      <div class="pc-card">
+        <div class="pc-card-header">
+          <span class="pc-badge badge-source">Source</span>
+          <div>
+            <div class="pc-name">PC 1 — The machine you're copying from</div>
+            <div class="pc-sub">Has your active browser sessions</div>
+          </div>
+        </div>
+        <div class="pc-card-body">
+          <div class="steps">
+            <div class="step step-active">
+              <div class="step-num">1</div>
+              <div>
+                <div class="step-title">Close all browser windows</div>
+                <div class="step-text">Chrome, Edge, Firefox — close them all. Open cookie databases are locked and can't be read.</div>
+              </div>
+            </div>
+            <div class="step step-active">
+              <div class="step-num">2</div>
+              <div>
+                <div class="step-title">Run serve_cookies.py</div>
+                <div class="step-text">Exports your cookies and starts a local server on port 9876.</div>
+                <div class="code-wrap">
+                  <code id="serveCmd">python serve_cookies.py --password mypass</code>
+                  <button class="copy-btn" onclick="copyCode('serveCmd', this)">Copy</button>
+                </div>
+              </div>
+            </div>
+            <div class="step step-active">
+              <div class="step-num">3</div>
+              <div>
+                <div class="step-title">Note your LAN IP</div>
+                <div class="step-text">The script prints your IP, e.g. <code style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--accent)">192.168.1.42</code>. You'll enter it on PC 2.</div>
+              </div>
+            </div>
+            <div class="step step-active">
+              <div class="step-num">4</div>
+              <div>
+                <div class="step-title">Wait for the receiver</div>
+                <div class="step-text">The server stays up until PC 2 connects and downloads the cookies. Then it shuts down automatically.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Arrow -->
+      <div class="arrow-col">
+        <div class="arrow-body">
+          <div class="arrow-dot"></div>
+          <div class="arrow-line"></div>
+          <div class="arrow-label">LAN</div>
+          <div class="arrow-line"></div>
+          <div class="arrow-head">▼</div>
+        </div>
+      </div>
+
+      <!-- Target PC -->
+      <div class="pc-card">
+        <div class="pc-card-header">
+          <span class="pc-badge badge-target">Target</span>
+          <div>
+            <div class="pc-name">PC 2 — The machine receiving cookies</div>
+            <div class="pc-sub">Will get all sessions from PC 1</div>
+          </div>
+        </div>
+        <div class="pc-card-body">
+          <div class="steps">
+            <div class="step step-active">
+              <div class="step-num">1</div>
+              <div>
+                <div class="step-title">Close all browser windows</div>
+                <div class="step-text">Same as PC 1 — all browsers must be closed before import.</div>
+              </div>
+            </div>
+            <div class="step step-active">
+              <div class="step-num">2</div>
+              <div>
+                <div class="step-title">Enter PC 1's LAN IP</div>
+                <div class="step-text">Shown in the terminal on PC 1 after running serve_cookies.</div>
+                <div class="input-group">
+                  <div class="input-row">
+                    <input type="text" class="text-input" id="sourceIpInput" placeholder="192.168.1.42" oninput="updateCommands(); validateIp(this)">
+                    <span class="ip-status ip-empty" id="ipStatus">waiting</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="step step-active">
+              <div class="step-num">3</div>
+              <div>
+                <div class="step-title">Run receive_cookies.py</div>
+                <div class="step-text">Fetches and installs cookies into Chrome, Edge, and Firefox.</div>
+                <div class="code-wrap">
+                  <code id="receiveCmd">python receive_cookies.py 192.168.1.42 --password mypass</code>
+                  <button class="copy-btn" onclick="copyCode('receiveCmd', this)">Copy</button>
+                </div>
+              </div>
+            </div>
+            <div class="step step-active">
+              <div class="step-num">4</div>
+              <div>
+                <div class="step-title">Open your browsers</div>
+                <div class="step-text">You should be logged in everywhere. If a site logs you out, it may bind sessions to IP or device fingerprint.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /transfer-grid -->
+
+  </div><!-- /panel-lan -->
+
+  <!-- ═══ Manual Panel ═══ -->
+  <div class="panel" id="panel-manual">
+
+    <p class="section-label">Manual Transfer</p>
+    <h2 class="section-title">Transfer via USB or shared folder</h2>
+    <p class="section-desc">Use when the PCs aren't on the same network. Copy a JSON file between machines.</p>
+
+    <div class="manual-grid">
+
+      <!-- Export -->
+      <div class="pc-card">
+        <div class="pc-card-header">
+          <span class="pc-badge badge-source">Step 1</span>
+          <div>
+            <div class="pc-name">Source PC — Export</div>
+            <div class="pc-sub">Creates cookies_export.json</div>
+          </div>
+        </div>
+        <div class="pc-card-body">
+          <div class="steps">
+            <div class="step step-active">
+              <div class="step-num">1</div>
+              <div>
+                <div class="step-title">Close all browser windows</div>
+                <div class="step-text">Chrome, Edge, Firefox must all be closed.</div>
+              </div>
+            </div>
+            <div class="step step-active">
+              <div class="step-num">2</div>
+              <div>
+                <div class="step-title">Run export_cookies.py</div>
+                <div class="step-text">Decrypts and exports all cookie data to a portable file.</div>
+                <div class="code-wrap">
+                  <code>python export_cookies.py</code>
+                  <button class="copy-btn" onclick="copyText('python export_cookies.py', this)">Copy</button>
+                </div>
+              </div>
+            </div>
+            <div class="step step-active">
+              <div class="step-num">3</div>
+              <div>
+                <div class="step-title">Copy cookies_export.json</div>
+                <div class="step-text">Move the file to PC 2 via USB drive, shared folder, or any file transfer method.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Arrow -->
+      <div class="arrow-col">
+        <div class="arrow-body">
+          <div class="arrow-dot"></div>
+          <div class="arrow-line"></div>
+          <div class="arrow-label">USB</div>
+          <div class="arrow-line"></div>
+          <div class="arrow-head">▼</div>
+        </div>
+      </div>
+
+      <!-- Import -->
+      <div class="pc-card">
+        <div class="pc-card-header">
+          <span class="pc-badge badge-target">Step 2</span>
+          <div>
+            <div class="pc-name">Target PC — Import</div>
+            <div class="pc-sub">Reads cookies_export.json</div>
+          </div>
+        </div>
+        <div class="pc-card-body">
+          <div class="steps">
+            <div class="step step-active">
+              <div class="step-num">1</div>
+              <div>
+                <div class="step-title">Close all browser windows</div>
+                <div class="step-text">All browsers must be closed before import or they'll lock the database.</div>
+              </div>
+            </div>
+            <div class="step step-active">
+              <div class="step-num">2</div>
+              <div>
+                <div class="step-title">Place files in the same folder</div>
+                <div class="step-text">Put <code style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--accent)">cookies_export.json</code> and <code style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--accent)">import_cookies.py</code> in the same directory.</div>
+              </div>
+            </div>
+            <div class="step step-active">
+              <div class="step-num">3</div>
+              <div>
+                <div class="step-title">Run import_cookies.py</div>
+                <div class="step-text">Installs cookies into Chrome, Edge, and Firefox with a freshly generated encryption key.</div>
+                <div class="code-wrap">
+                  <code>python import_cookies.py</code>
+                  <button class="copy-btn" onclick="copyText('python import_cookies.py', this)">Copy</button>
+                </div>
+              </div>
+            </div>
+            <div class="step step-active">
+              <div class="step-num">4</div>
+              <div>
+                <div class="step-title">Open your browsers</div>
+                <div class="step-text">Backed up original files are saved as <code style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--txt-2)">Cookies.bak</code> — restore them if anything goes wrong.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div><!-- /panel-manual -->
+
+  <!-- ═══ How it works Panel ═══ -->
+  <div class="panel" id="panel-how">
+
+    <p class="section-label">Reference</p>
+    <h2 class="section-title">How it works</h2>
+    <p class="section-desc">CookieSync decrypts cookies on the source machine and re-encrypts them with a new key on the target.</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Browser</th>
+            <th>Storage format</th>
+            <th>Export method</th>
+            <th>Import method</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Chrome</strong></td>
+            <td>Encrypted SQLite <span class="tag tag-green">DPAPI + AES-256-GCM</span></td>
+            <td>Decrypt with machine key via <code style="font-family:'JetBrains Mono',monospace;font-size:12px">win32crypt</code></td>
+            <td>Generate new key on target, re-encrypt all values</td>
+          </tr>
+          <tr>
+            <td><strong>Edge</strong></td>
+            <td>Encrypted SQLite <span class="tag tag-green">DPAPI + AES-256-GCM</span></td>
+            <td>Same as Chrome</td>
+            <td>Same as Chrome</td>
+          </tr>
+          <tr>
+            <td><strong>Firefox</strong></td>
+            <td>Plain SQLite <span class="tag tag-blue">cookies.sqlite</span></td>
+            <td>Direct read — no encryption layer</td>
+            <td>Direct write into Firefox profile</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="notes" style="margin-top:24px;">
+      <div class="notes-title">Things to know</div>
+      <div class="note-item">
+        <span class="note-dot">—</span>
+        <span><strong>Session cookies</strong> (no expiry date) may not survive — browsers often don't flush those to disk.</span>
+      </div>
+      <div class="note-item">
+        <span class="note-dot">—</span>
+        <span><strong>Some sites</strong> (Google, banks) bind sessions to IP or device fingerprint and may log you out regardless of the cookie transfer.</span>
+      </div>
+      <div class="note-item">
+        <span class="note-dot">—</span>
+        <span><strong>LAN only:</strong> the receiver rejects connections from non-private IP ranges. This tool is designed for your local network, not the internet.</span>
+      </div>
+      <div class="note-item">
+        <span class="note-dot">—</span>
+        <span><strong>Backups:</strong> originals are saved as <code style="font-family:'JetBrains Mono',monospace;font-size:12px">Cookies.bak</code> (Chrome/Edge) and <code style="font-family:'JetBrains Mono',monospace;font-size:12px">cookies.sqlite.bak</code> (Firefox) before any overwrite.</span>
+      </div>
+      <div class="note-item">
+        <span class="note-dot">—</span>
+        <span><strong>Run as your normal user account,</strong> not as Administrator.</span>
+      </div>
+      <div class="note-item">
+        <span class="note-dot">—</span>
+        <span><strong>Requirements:</strong> Python 3.8+ on both PCs. Install once: <code style="font-family:'JetBrains Mono',monospace;font-size:12px">pip install pycryptodome pywin32</code></span>
+      </div>
+    </div>
+
+  </div><!-- /panel-how -->
+
+  <div class="section-divider"></div>
+
+  <footer class="footer">
+    <div class="footer-txt">Cookie<span>Sync</span> · LAN Transfer Tool · Python 3.8+</div>
+    <div class="footer-txt">pip install pycryptodome pywin32</div>
+  </footer>
+
+</div><!-- /page -->
+
+<!-- Toast -->
+<div class="toast" id="toast">Copied to clipboard</div>
+
+<script>
+  // ── Theme toggle ──
+  function toggleTheme() {
+    const root = document.documentElement;
+    const btn = document.getElementById('themeBtn');
+    const current = root.getAttribute('data-theme');
+    if (current === 'light') {
+      root.removeAttribute('data-theme');
+      btn.textContent = '☀ Light';
+    } else if (!current) {
+      root.setAttribute('data-theme', 'dark');
+      btn.textContent = '◑ System';
+    } else {
+      root.setAttribute('data-theme', 'light');
+      btn.textContent = '☾ Dark';
+    }
+    try { localStorage.setItem('cs-theme', root.getAttribute('data-theme') || 'system'); } catch(e) {}
+  }
+
+  // Restore theme
+  try {
+    const saved = localStorage.getItem('cs-theme');
+    if (saved && saved !== 'system') document.documentElement.setAttribute('data-theme', saved);
+  } catch(e) {}
+
+  // ── Tab switching ──
+  function switchTab(name, btn) {
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('panel-' + name).classList.add('active');
+    btn.classList.add('active');
+  }
+
+  // ── Command generation ──
+  function updateCommands() {
+    const pw = document.getElementById('passwordInput').value.trim() || 'mypass';
+    const ip = document.getElementById('sourceIpInput').value.trim() || '192.168.1.42';
+    const interval = document.getElementById('intervalInput').value.trim() || '30';
+    const isRefresh = document.getElementById('refreshToggle').classList.contains('on');
+
+    let serveCmd = `python serve_cookies.py --password ${pw}`;
+    let receiveCmd = `python receive_cookies.py ${ip} --password ${pw}`;
+    if (isRefresh) {
+      serveCmd += ` --refresh ${interval}`;
+      receiveCmd += ` --refresh ${interval}`;
+    }
+    document.getElementById('serveCmd').textContent = serveCmd;
+    document.getElementById('receiveCmd').textContent = receiveCmd;
+  }
+
+  // ── Refresh toggle ──
+  let refreshOn = false;
+  function toggleRefresh() {
+    refreshOn = !refreshOn;
+    const btn = document.getElementById('refreshToggle');
+    const ctrl = document.getElementById('refreshControls');
+    btn.classList.toggle('on', refreshOn);
+    ctrl.style.display = refreshOn ? 'flex' : 'none';
+    updateCommands();
+  }
+
+  // ── IP validation ──
+  function validateIp(input) {
+    const val = input.value.trim();
+    const status = document.getElementById('ipStatus');
+    if (!val) {
+      status.className = 'ip-status ip-empty';
+      status.textContent = 'waiting';
+      return;
+    }
+    const parts = val.split('.');
+    const valid = parts.length === 4 && parts.every(p => {
+      const n = parseInt(p, 10);
+      return !isNaN(n) && n >= 0 && n <= 255 && String(n) === p;
+    });
+    const isPrivate = valid && (
+      parts[0] === '10' ||
+      (parts[0] === '172' && parseInt(parts[1]) >= 16 && parseInt(parts[1]) <= 31) ||
+      (parts[0] === '192' && parts[1] === '168') ||
+      parts[0] === '127'
+    );
+    if (valid && isPrivate) {
+      status.className = 'ip-status ip-valid';
+      status.textContent = 'LAN ✓';
+    } else if (valid && !isPrivate) {
+      status.className = 'ip-status ip-invalid';
+      status.textContent = 'not LAN';
+    } else {
+      status.className = 'ip-status ip-invalid';
+      status.textContent = 'invalid';
+    }
+  }
+
+  // ── Copy helpers ──
+  let toastTimer = null;
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 2000);
+  }
+
+  function copyCode(id, btn) {
+    const text = document.getElementById(id).textContent;
+    copyText(text, btn);
+  }
+
+  function copyText(text, btn) {
+    const originalText = btn ? btn.textContent : '';
+    navigator.clipboard.writeText(text).then(() => {
+      if (btn) { btn.textContent = 'Copied!'; btn.classList.add('copied'); }
+      showToast('Copied to clipboard');
+      setTimeout(() => {
+        if (btn) { btn.textContent = originalText; btn.classList.remove('copied'); }
+      }, 1800);
+    }).catch(() => {
+      // Fallback: select text
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.cssText = 'position:fixed;opacity:0;top:0;left:0';
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand('copy'); } catch(e) {}
+      document.body.removeChild(ta);
+      if (btn) { btn.textContent = 'Copied!'; btn.classList.add('copied'); }
+      showToast('Copied');
+      setTimeout(() => {
+        if (btn) { btn.textContent = originalText; btn.classList.remove('copied'); }
+      }, 1800);
+    });
+  }
+</script>
