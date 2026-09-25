@@ -1,0 +1,135 @@
+HOW THE APP WORKS — PLAIN ENGLISH EXPLANATION
+==============================================
+App: client.vrxtool.wingo1 (app-release.apk)
+Analysis Date: 2026-09-25
+
+
+WHAT IS THIS APP?
+-----------------
+This is a paid subscription tool that targets people who play Wingo — a color
+prediction game popular in India where you bet on colors (Red/Green/Violet) and
+numbers. The app pretends to give users an "edge" by showing them what to bet
+on next. It operates entirely outside official app stores and is sold privately,
+usually through Telegram channels.
+
+
+HOW A USER EXPERIENCES IT
+--------------------------
+1. Someone shares the APK file (you can't find this on Google Play)
+2. User installs it, opens it, and it connects to the developer's server
+3. The app asks for "Draw Over Other Apps" permission (overlay permission)
+4. User logs in — the server checks if they have an active subscription
+5. A floating bubble/widget appears on screen that the user can drag around
+6. User opens the Wingo app. The floating widget stays on top of it
+7. The widget shows a countdown timer and a "signal" (what color/number to bet)
+8. User bets according to the signal
+9. Each signal used deducts from their "limit" (e.g. 50 signals per plan)
+10. When limit runs out, a BLOCKED screen appears with a Telegram button to buy more
+
+
+THE TWO FLOATING OVERLAYS
+--------------------------
+The app creates two different floating windows that sit on top of other apps:
+
+OVERLAY 1 (main signal overlay):
+- Shows the product/plan name
+- Shows a countdown timer (counts down to the next Wingo round)
+- Shows the current "limit" remaining
+- Has an expandable panel that appears when you tap it
+- Polls the server every 2 seconds for updated signals
+- Has a Lottie animation (likely plays when a "win" happens)
+
+OVERLAY 2 (settings/info overlay):
+- Shows your device model and Android version
+- Shows your balance amount in Indian Rupees (INR ₹)
+- Has a toggle switch (likely switches between signal modes)
+- Updates every 100 milliseconds (very fast — synced to Wingo's round timer)
+- Has action buttons for different betting options
+
+
+HOW THE BACKEND WORKS
+----------------------
+The app talks to a server at: ubfuturetech.com
+
+Every request is signed like this:
+  signature = MD5(device_id + secret_key + current_timestamp)
+
+The server has these endpoints:
+  - register_device  : called on first launch, registers your phone
+  - get_main_product : fetches the main signal/prediction data
+  - product_lists    : fetches the list of available subscription plans to buy
+  - get_config       : fetches your account info (username, limit, balance shown)
+
+The server controls everything:
+  - How many signals you have left (limit_left)
+  - What your displayed balance is (register_amount, default ₹900)
+  - Whether you are blocked or in maintenance mode
+  - What signals/predictions to show
+
+
+THE SUBSCRIPTION MODEL
+-----------------------
+- Users pay to get a set number of "signals" (e.g. 50, 100, 500 uses)
+- Each time they follow a signal, the counter goes down
+- When it hits zero, the BLOCKED screen appears
+- The BLOCKED screen has a Telegram button — user messages the seller to buy more
+- The MAINTENANCE screen appears when the developer takes the server down temporarily
+- Both screens prevent you from doing anything else in the app until resolved
+
+
+WHAT THE "SIGNAL" ACTUALLY IS
+-------------------------------
+The signal is just data sent from the server. The server decides what color or
+number to display. This has ZERO connection to what Wingo's actual outcome will
+be. Wingo's results are random (or server-determined on Wingo's end). No third-
+party app can know or influence the result.
+
+Any wins users experience are coincidence. Confirmation bias (remembering wins,
+forgetting losses) keeps them buying more signals.
+
+
+THE SECURITY LOCKS (why it blocks certain things)
+---------------------------------------------------
+The app kills itself immediately if it detects:
+
+  EMULATOR   — blocks running in Android Studio / Genymotion / BlueStacks
+  ROOT       — blocks rooted phones where traffic can be intercepted
+  DEBUGGER   — blocks anyone attaching a debugger to inspect the code live
+  VPN/PROXY  — blocks tools like Burp Suite that intercept HTTPS traffic
+
+These are NOT security features to protect the USER. They protect the DEVELOPER
+from security researchers figuring out how the server communication works or what
+data is really being sent and received.
+
+
+WHO BUILT IT
+-------------
+Inside the code there is a syntax highlighter with a custom word list:
+  Uzuakoli, Amoji, Bright, Ndudirim, Ezinwanne, Lightworker, Isuochi, Abia, Ngodo
+
+Uzuakoli and Isuochi are towns in Abia State, Nigeria. "Bright" and "Ndudirim"
+are common Nigerian names. The developer is almost certainly from Abia State,
+Nigeria. The backend domain contains the fragment "robrother1" which may be
+their handle or brand name.
+
+
+LIBRARIES AND TECH USED
+------------------------
+- OkHttp3       : HTTP networking (API calls)
+- Glide         : Image loading (product images from server)
+- Lottie        : Animated graphics (win animations)
+- Gson          : JSON parsing (server responses)
+- MatrixEffect  : Custom "matrix rain" visual effect on the login screen
+- RecyclerView  : Scrollable list of subscription products
+- SharedPrefs   : Stores API credentials and session data locally
+
+
+SUMMARY IN ONE PARAGRAPH
+--------------------------
+The app is a paid overlay tool. Users install it, pay via Telegram for a plan,
+and the app shows a floating widget on top of the Wingo gambling app. The widget
+displays a timer and a "prediction" from the developer's server. The predictions
+have no real connection to Wingo's outcomes. The anti-analysis protections exist
+to stop security researchers from exposing this. The app earns money by selling
+hope to gamblers. It is distributed entirely through private Telegram channels
+to avoid app store review.
