@@ -42,6 +42,24 @@ CREATE TABLE IF NOT EXISTS app_config (
     cfg_value   TEXT,
     updated_at  DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS products (
+    id     INT AUTO_INCREMENT PRIMARY KEY,
+    name   VARCHAR(120) NOT NULL,
+    image  TEXT,
+    url    TEXT,
+    sort   INT DEFAULT 0,
+    active TINYINT(1) DEFAULT 1
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+");
+
+// Default products (trending hack list). Edit in admin → Products.
+$db->exec("
+INSERT IGNORE INTO products (id, name, image, url, sort) VALUES
+  (1, 'Yaar Win Hack',   '', 'https://www.yaarwin.com',       0),
+  (2, 'Jai Club Hack',   '', 'https://www.jaiclub.com',       1),
+  (3, 'Jalwa Game Hack', '', 'https://www.jalwa.game',        2),
+  (4, 'Tiranga Lottery', '', 'https://www.tirangagames.com',  3);
 ");
 
 // Default plans
@@ -63,7 +81,10 @@ INSERT IGNORE INTO app_config (cfg_key, cfg_value) VALUES
   ('maintenance', '0'),
   ('telegram_handle', '@noraphillip'),
   ('telegram_url', 'https://t.me/noraphillip'),
-  ('app_version', '1.0.0');
+  ('app_version', '1.0.0'),
+  ('banner_name', 'VEERGAME HACK'),
+  ('banner_image', ''),
+  ('banner_url', 'https://www.veergame24.com');
 ");
 
 echo '<h2 style=\"font-family:sans-serif;color:green;\">✓ Nora database installed successfully!</h2>';

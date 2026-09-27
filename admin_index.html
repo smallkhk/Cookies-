@@ -1,0 +1,994 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Nora Admin</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=DM+Sans:wght@300;400;500;600;700&display=swap">
+<style>
+:root{
+  --void:#07070F;--surface:#111120;--surface2:#191928;--surface3:#1F1F32;
+  --gold:#C9A84C;--gold-dim:rgba(201,168,76,.15);--gold-border:rgba(201,168,76,.25);
+  --violet:#7C5CBF;--text:#E8E8F2;--text-dim:#7777A0;--border:rgba(255,255,255,.07);
+  --green:#3DB87A;--red:#E05555;--orange:#E09040;--blue:#4488CC;
+  color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+[hidden]{display:none!important;}
+html,body{min-height:100%;font-family:'DM Sans',sans-serif;font-size:14px;background:var(--void);color:var(--text);}
+
+/* LAYOUT */
+.layout{display:grid;grid-template-columns:220px 1fr;min-height:100vh;}
+@media(max-width:700px){.layout{grid-template-columns:1fr;}.sidebar{display:none;}}
+
+/* SIDEBAR */
+.sidebar{background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto;}
+.sidebar-logo{padding:24px 20px 20px;border-bottom:1px solid var(--border);}
+.sidebar-logo span{font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:600;color:var(--gold);letter-spacing:.2em;display:block;}
+.sidebar-logo small{font-size:.6rem;color:var(--text-dim);letter-spacing:.15em;text-transform:uppercase;display:block;margin-top:2px;}
+.nav-section{padding:16px 12px 4px;}
+.nav-label{font-size:.58rem;color:var(--text-dim);letter-spacing:.18em;text-transform:uppercase;padding:0 8px;margin-bottom:4px;}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;cursor:pointer;color:var(--text-dim);font-size:.82rem;font-weight:500;transition:all .18s;border:none;background:none;width:100%;text-align:left;margin-bottom:2px;}
+.nav-item svg{width:16px;height:16px;flex-shrink:0;}
+.nav-item:hover{background:var(--surface2);color:var(--text);}
+.nav-item.active{background:var(--gold-dim);color:var(--gold);}
+.sidebar-footer{margin-top:auto;padding:16px;border-top:1px solid var(--border);font-size:.7rem;color:var(--text-dim);}
+.sidebar-footer strong{color:var(--text);display:block;margin-bottom:6px;}
+
+/* MAIN */
+.main{display:flex;flex-direction:column;min-height:100vh;}
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 28px;height:58px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
+.topbar-right{display:flex;align-items:center;gap:10px;}
+.api-dot{width:7px;height:7px;border-radius:50%;background:var(--green);}
+.api-badge{display:flex;align-items:center;gap:6px;background:var(--surface2);border:1px solid var(--gold-border);border-radius:20px;padding:5px 12px;font-size:.65rem;color:var(--gold);font-family:monospace;}
+.page-content{padding:28px;flex:1;}
+
+/* VIEWS */
+.view{display:none;}.view.active{display:block;}
+
+/* PAGE HEADER */
+.page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;gap:12px;flex-wrap:wrap;}
+.page-header h2{font-size:1.15rem;font-weight:600;}
+.page-header p{font-size:.75rem;color:var(--text-dim);margin-top:2px;}
+
+/* STAT TILES */
+.stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:16px;margin-bottom:28px;}
+.stat-tile{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px 20px;}
+.stat-label{font-size:.65rem;color:var(--text-dim);letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px;}
+.stat-value{font-size:1.6rem;font-weight:700;font-variant-numeric:tabular-nums;line-height:1;}
+.stat-value.gold{color:var(--gold);}.stat-value.green{color:var(--green);}.stat-value.red{color:var(--red);}
+.stat-sub{font-size:.68rem;color:var(--text-dim);margin-top:6px;}
+
+/* CARD */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:20px;}
+.card-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+.card-title{font-size:.82rem;font-weight:600;}
+
+/* TABLE */
+.tbl-wrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:.78rem;}
+thead th{padding:10px 16px;text-align:left;font-size:.62rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);background:var(--surface2);border-bottom:1px solid var(--border);white-space:nowrap;}
+tbody tr{border-bottom:1px solid var(--border);transition:background .15s;}
+tbody tr:last-child{border-bottom:none;}
+tbody tr:hover{background:var(--surface2);}
+td{padding:12px 16px;color:var(--text);}
+td.dim{color:var(--text-dim);}
+td code{font-family:monospace;font-size:.7rem;background:var(--surface2);padding:2px 6px;border-radius:4px;color:var(--text-dim);}
+
+/* BADGES */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:.62rem;font-weight:600;letter-spacing:.05em;text-transform:uppercase;}
+.badge-green{background:rgba(61,184,122,.15);color:var(--green);}
+.badge-red{background:rgba(224,85,85,.15);color:var(--red);}
+.badge-gold{background:var(--gold-dim);color:var(--gold);}
+.badge-dim{background:var(--surface2);color:var(--text-dim);}
+.badge-violet{background:rgba(124,92,191,.15);color:#A080E8;}
+.badge-orange{background:rgba(224,144,64,.15);color:var(--orange);}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.75rem;font-weight:600;cursor:pointer;transition:all .18s;border:none;white-space:nowrap;}
+.btn-gold{background:linear-gradient(135deg,#C9A84C,#8A6820);color:#08080F;}
+.btn-gold:hover{filter:brightness(1.1);}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--text-dim);}
+.btn-outline:hover{border-color:var(--gold);color:var(--gold);}
+.btn-danger{background:rgba(224,85,85,.12);border:1px solid rgba(224,85,85,.2);color:var(--red);}
+.btn-danger:hover{background:rgba(224,85,85,.22);}
+.btn-green{background:rgba(61,184,122,.12);border:1px solid rgba(61,184,122,.2);color:var(--green);}
+.btn-sm{padding:5px 12px;font-size:.68rem;border-radius:6px;}
+.btn svg{width:14px;height:14px;}
+
+/* INPUTS */
+.bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.search-wrap{position:relative;flex:1;min-width:180px;max-width:320px;}
+.search-wrap svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);width:14px;height:14px;color:var(--text-dim);}
+.search-input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 12px 8px 34px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.78rem;outline:none;transition:border-color .2s;}
+.search-input:focus{border-color:var(--gold);}
+.search-input::placeholder{color:var(--text-dim);}
+select.filter{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text-dim);font-family:'DM Sans',sans-serif;font-size:.75rem;outline:none;cursor:pointer;}
+select.filter:focus{border-color:var(--gold);}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px;}
+.modal{background:var(--surface);border:1px solid var(--gold-border);border-radius:18px;width:100%;max-width:460px;max-height:90vh;overflow-y:auto;}
+.modal-header{padding:20px 24px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--surface);z-index:1;}
+.modal-title{font-size:.9rem;font-weight:600;}
+.modal-close{width:28px;height:28px;border-radius:50%;background:var(--surface2);border:none;color:var(--text-dim);cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.modal-body{padding:20px 24px;}
+.modal-footer{padding:0 24px 20px;display:flex;gap:10px;justify-content:flex-end;}
+
+/* FORMS */
+.form-group{display:flex;flex-direction:column;gap:14px;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+@media(max-width:480px){.form-row{grid-template-columns:1fr;}}
+.field{display:flex;flex-direction:column;gap:5px;}
+.field label{font-size:.68rem;color:var(--text-dim);letter-spacing:.08em;text-transform:uppercase;}
+.field input,.field select,.field textarea{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.8rem;outline:none;transition:border-color .2s;}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--gold);}
+.field input::placeholder{color:var(--text-dim);}
+
+/* LOGIN */
+.login-page{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:radial-gradient(ellipse 50% 60% at 50% 30%,rgba(201,168,76,.07) 0%,transparent 70%),var(--void);}
+.login-card{width:100%;max-width:360px;background:var(--surface);border:1px solid var(--gold-border);border-radius:20px;padding:36px 32px;}
+.login-logo{text-align:center;margin-bottom:28px;}
+.login-logo span{font-family:'Cormorant Garamond',serif;font-size:2.4rem;font-weight:600;color:var(--gold);letter-spacing:.25em;display:block;}
+.login-logo small{font-size:.6rem;color:var(--text-dim);letter-spacing:.2em;text-transform:uppercase;}
+.login-err{background:rgba(224,85,85,.1);border:1px solid rgba(224,85,85,.2);border-radius:8px;padding:10px 14px;font-size:.74rem;color:var(--red);margin-bottom:14px;display:none;}
+
+/* PLANS GRID */
+.plans-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;}
+.plan-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;position:relative;transition:border-color .2s;}
+.plan-card:hover{border-color:var(--gold-border);}
+.plan-card.featured{border-color:var(--gold-border);}
+.plan-name{font-size:.9rem;font-weight:600;margin-bottom:4px;}
+.plan-signals{font-size:1.8rem;font-weight:700;color:var(--gold);font-variant-numeric:tabular-nums;line-height:1.1;margin-bottom:2px;}
+.plan-signals span{font-size:.7rem;color:var(--text-dim);font-weight:400;}
+.plan-price{font-size:.78rem;color:var(--text-dim);margin-bottom:16px;}
+.plan-actions{display:flex;gap:8px;}
+
+/* SETTINGS */
+.settings-section{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:16px;}
+.settings-section h3{font-size:.82rem;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--border);}
+.setting-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.04);gap:12px;flex-wrap:wrap;}
+.setting-row:last-child{border-bottom:none;}
+.setting-info{flex:1;min-width:140px;}
+.setting-label{font-size:.8rem;font-weight:500;}
+.setting-desc{font-size:.68rem;color:var(--text-dim);margin-top:2px;}
+.setting-input{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.78rem;outline:none;min-width:240px;transition:border-color .2s;}
+.setting-input:focus{border-color:var(--gold);}
+
+/* TOGGLE */
+.toggle{position:relative;width:40px;height:22px;cursor:pointer;flex-shrink:0;}
+.toggle input{opacity:0;width:0;height:0;}
+.toggle-track{position:absolute;inset:0;background:var(--surface2);border:1px solid var(--border);border-radius:11px;transition:background .25s;}
+.toggle input:checked+.toggle-track{background:var(--gold);border-color:var(--gold);}
+.toggle-track::after{content:'';position:absolute;width:16px;height:16px;background:#fff;border-radius:50%;top:2px;left:2px;transition:transform .25s;box-shadow:0 1px 4px rgba(0,0,0,.3);}
+.toggle input:checked+.toggle-track::after{transform:translateX(18px);}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 18px;font-size:.78rem;z-index:999;transform:translateY(80px);opacity:0;transition:all .3s cubic-bezier(.34,1.56,.64,1);max-width:300px;}
+.toast.ok{border-color:var(--green);color:var(--green);}
+.toast.err{border-color:var(--red);color:var(--red);}
+.toast.show{transform:translateY(0);opacity:1;}
+
+/* LOG */
+.log-item{display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);font-size:.76rem;}
+.log-item:last-child{border-bottom:none;}
+.log-dot{width:8px;height:8px;border-radius:50%;margin-top:4px;flex-shrink:0;}
+.log-time{color:var(--text-dim);font-size:.65rem;white-space:nowrap;}
+.log-msg{flex:1;}
+
+/* SPINNER */
+.spinner{width:20px;height:20px;border:2px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin .7s linear infinite;margin:auto;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.loading-row td{text-align:center;padding:24px;}
+
+/* TOPUP ROW */
+.topup-row{display:flex;gap:6px;align-items:center;}
+.topup-row input{width:70px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:5px 8px;color:var(--text);font-size:.75rem;outline:none;text-align:center;}
+.topup-row input:focus{border-color:var(--gold);}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-page" class="login-page">
+  <div class="login-card">
+    <div class="login-logo"><span>NORA</span><small>Admin Panel</small></div>
+    <p style="font-size:.85rem;font-weight:600;margin-bottom:20px;">Sign in to continue</p>
+    <div class="login-err" id="login-err">Incorrect username or password.</div>
+    <div class="form-group" style="margin-bottom:20px;">
+      <div class="field"><label>Username</label><input type="text" id="adm-user" placeholder="admin" autocomplete="off"></div>
+      <div class="field"><label>Password</label><input type="password" id="adm-pass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
+    </div>
+    <button class="btn btn-gold" style="width:100%;justify-content:center;" onclick="doLogin()">Sign In</button>
+    <p style="text-align:center;font-size:.65rem;color:var(--text-dim);margin-top:16px;">
+      <span id="api-domain" style="color:var(--gold);font-family:monospace;font-size:.65rem;">apk.eclipselivecam.online</span>
+    </p>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app" class="layout" hidden>
+  <aside class="sidebar">
+    <div class="sidebar-logo"><span>NORA</span><small>Admin Panel</small></div>
+    <div class="nav-section">
+      <p class="nav-label">Main</p>
+      <button class="nav-item active" data-view="dashboard">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        Dashboard
+      </button>
+      <button class="nav-item" data-view="users">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Users
+      </button>
+      <button class="nav-item" data-view="plans">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 3H8a2 2 0 0 0-2 2v2h12V5a2 2 0 0 0-2-2z"/></svg>
+        Plans
+      </button>
+      <button class="nav-item" data-view="products">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+        Products
+      </button>
+      <button class="nav-item" data-view="activity">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        Activity Log
+      </button>
+    </div>
+    <div class="nav-section">
+      <p class="nav-label">Config</p>
+      <button class="nav-item" data-view="settings">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+        App Settings
+      </button>
+      <button class="nav-item" data-view="telegram">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        Telegram
+      </button>
+    </div>
+    <div class="sidebar-footer">
+      <strong>admin</strong>
+      <button class="btn btn-outline btn-sm" onclick="doLogout()" style="width:100%;">Sign Out</button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <p style="font-size:.8rem;color:var(--text-dim);">NORA Admin</p>
+      <div class="topbar-right">
+        <div class="api-badge"><span class="api-dot"></span>apk.eclipselivecam.online</div>
+        <button class="btn btn-outline btn-sm" onclick="loadCurrentView()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+          Refresh
+        </button>
+      </div>
+    </header>
+
+    <div class="page-content">
+
+      <!-- DASHBOARD -->
+      <div id="view-dashboard" class="view active">
+        <div class="page-header">
+          <div><h2>Dashboard</h2><p>Live overview</p></div>
+          <button class="btn btn-gold" onclick="openAddUser()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Add User
+          </button>
+        </div>
+        <div class="stats-row" id="stats-row">
+          <div class="stat-tile"><p class="stat-label">Total Users</p><p class="stat-value" id="st-total">—</p><p class="stat-sub" id="st-new">loading…</p></div>
+          <div class="stat-tile"><p class="stat-label">Active</p><p class="stat-value green" id="st-active">—</p><p class="stat-sub" id="st-blocked-txt">—</p></div>
+          <div class="stat-tile"><p class="stat-label">Signals Today</p><p class="stat-value gold" id="st-sigs">—</p><p class="stat-sub">API calls today</p></div>
+          <div class="stat-tile"><p class="stat-label">Total Balance</p><p class="stat-value gold" id="st-rev">—</p><p class="stat-sub">Sum of all user balances</p></div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Recent Users</span>
+            <button class="btn btn-outline btn-sm" onclick="nav('users')">View all</button>
+          </div>
+          <div class="tbl-wrap"><table>
+            <thead><tr><th>Username</th><th>Plan</th><th>Signals Left</th><th>Status</th><th>Joined</th></tr></thead>
+            <tbody id="dash-tbody"><tr class="loading-row"><td colspan="5"><div class="spinner"></div></td></tr></tbody>
+          </table></div>
+        </div>
+      </div>
+
+      <!-- USERS -->
+      <div id="view-users" class="view">
+        <div class="page-header">
+          <div><h2>User Management</h2><p id="users-count">All accounts</p></div>
+          <button class="btn btn-gold" onclick="openAddUser()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Add User
+          </button>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="bar" style="flex:1;">
+              <div class="search-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <input class="search-input" id="user-search" placeholder="Search username, device…" oninput="filterUsers()">
+              </div>
+              <select class="filter" id="user-filter" onchange="filterUsers()">
+                <option value="all">All Status</option>
+                <option value="active">Active</option>
+                <option value="blocked">Blocked</option>
+                <option value="expired">Expired</option>
+              </select>
+            </div>
+          </div>
+          <div class="tbl-wrap"><table>
+            <thead><tr><th>#</th><th>Username</th><th>Device ID</th><th>Plan</th><th>Signals</th><th>Balance</th><th>Status</th><th>Joined</th><th>Actions</th></tr></thead>
+            <tbody id="users-tbody"><tr class="loading-row"><td colspan="9"><div class="spinner"></div></td></tr></tbody>
+          </table></div>
+        </div>
+      </div>
+
+      <!-- PLANS -->
+      <div id="view-plans" class="view">
+        <div class="page-header">
+          <div><h2>Plans</h2><p>Subscription tiers</p></div>
+          <button class="btn btn-gold" onclick="openAddPlan()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            New Plan
+          </button>
+        </div>
+        <div class="plans-grid" id="plans-grid"><div class="spinner"></div></div>
+      </div>
+
+      <!-- PRODUCTS -->
+      <div id="view-products" class="view">
+        <div class="page-header">
+          <div><h2>Products</h2><p>Trending hack list &amp; top banner shown in the app</p></div>
+          <button class="btn btn-gold" onclick="openAddProduct()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Add Product
+          </button>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">Hack list items</span></div>
+          <div class="tbl-wrap"><table>
+            <thead><tr><th>Order</th><th>Image</th><th>Name</th><th>Activate URL</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody id="products-tbody"><tr class="loading-row"><td colspan="6"><div class="spinner"></div></td></tr></tbody>
+          </table></div>
+        </div>
+        <div class="card" style="margin-top:16px;">
+          <div class="card-header"><span class="card-title">Top Banner (get_main_product)</span></div>
+          <div style="padding:16px 20px;display:grid;gap:12px;max-width:560px;">
+            <label class="fld"><span>Banner name</span><input id="banner_name" placeholder="VEERGAME HACK"></label>
+            <label class="fld"><span>Banner image URL</span><input id="banner_image" placeholder="https://…/veergame.png"></label>
+            <label class="fld"><span>Banner activate URL</span><input id="banner_url" placeholder="https://www.veergame24.com"></label>
+            <button class="btn btn-gold" style="justify-self:start;" onclick="saveBanner()">Save Banner</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ACTIVITY -->
+      <div id="view-activity" class="view">
+        <div class="page-header"><div><h2>Activity Log</h2><p>Recent system events</p></div></div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">Last 50 events</span></div>
+          <div style="padding:4px 20px 8px;" id="activity-list"><div class="spinner" style="margin:24px auto;"></div></div>
+        </div>
+      </div>
+
+      <!-- SETTINGS -->
+      <div id="view-settings" class="view">
+        <div class="page-header"><div><h2>App Settings</h2><p>Backend configuration</p></div></div>
+        <div class="settings-section">
+          <h3>App Toggles</h3>
+          <div class="setting-row">
+            <div class="setting-info"><p class="setting-label">Maintenance Mode</p><p class="setting-desc">Shows maintenance screen to all users</p></div>
+            <label class="toggle"><input type="checkbox" id="tog-maintenance" onchange="saveCfg('maintenance_mode',this.checked?'1':'0')"><span class="toggle-track"></span></label>
+          </div>
+          <div class="setting-row">
+            <div class="setting-info"><p class="setting-label">Registration Open</p><p class="setting-desc">Allow new device registrations</p></div>
+            <label class="toggle"><input type="checkbox" id="tog-reg" checked onchange="saveCfg('registration_open',this.checked?'1':'0')"><span class="toggle-track"></span></label>
+          </div>
+          <div class="setting-row">
+            <div class="setting-info"><p class="setting-label">Signal Override</p><p class="setting-desc">Force all users to receive this signal (BUY / SELL / HOLD — leave empty for random)</p></div>
+            <input class="setting-input" type="text" id="cfg-override" placeholder="e.g. BUY" onchange="saveCfg('signal_override',this.value.trim())">
+          </div>
+          <div class="setting-row">
+            <div class="setting-info"><p class="setting-label">App Version</p><p class="setting-desc">Shown on the about screen</p></div>
+            <input class="setting-input" type="text" id="cfg-version" placeholder="1.0.0" onchange="saveCfg('app_version',this.value.trim())">
+          </div>
+        </div>
+      </div>
+
+      <!-- TELEGRAM -->
+      <div id="view-telegram" class="view">
+        <div class="page-header"><div><h2>Telegram</h2><p>Channel and message settings</p></div></div>
+        <div class="settings-section">
+          <h3>Handle &amp; Link</h3>
+          <div class="setting-row">
+            <div class="setting-info"><p class="setting-label">Username</p><p class="setting-desc">Shown on blocked &amp; contact screens</p></div>
+            <input class="setting-input" type="text" id="tg-handle" placeholder="@noraphillip">
+          </div>
+          <div class="setting-row">
+            <div class="setting-info"><p class="setting-label">Channel Link</p><p class="setting-desc">Deep link for "Join via Telegram" button</p></div>
+            <input class="setting-input" type="text" id="tg-link" placeholder="https://t.me/noraphillip">
+          </div>
+          <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap;">
+            <button class="btn btn-gold" onclick="saveTelegram()">Save Telegram Settings</button>
+            <a href="https://t.me/noraphillip" target="_blank" rel="noopener">
+              <button class="btn btn-outline" type="button">Open Channel →</button>
+            </a>
+          </div>
+        </div>
+        <div class="settings-section">
+          <h3>Message Templates</h3>
+          <div class="field" style="margin-bottom:14px;">
+            <label>Blocked Screen Message</label>
+            <input type="text" id="msg-blocked" value="Your signal limit has been reached. Message @noraphillip on Telegram to renew your plan.">
+          </div>
+          <div class="field">
+            <label>Maintenance Message</label>
+            <input type="text" id="msg-maintenance" value="We're updating our servers. Back shortly. Contact @noraphillip for updates.">
+          </div>
+          <div style="margin-top:16px;">
+            <button class="btn btn-gold" onclick="toast('Templates saved','ok')">Save Templates</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<!-- ADD/EDIT USER MODAL -->
+<div class="modal-overlay" id="user-modal" hidden onclick="if(event.target===this)this.hidden=true">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="user-modal-title">Add User</span>
+      <button class="modal-close" onclick="document.getElementById('user-modal').hidden=true">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <div class="form-row">
+          <div class="field"><label>Username</label><input type="text" id="fm-username" placeholder="john_doe"></div>
+          <div class="field"><label>Password</label><input type="password" id="fm-password" placeholder="Set password"></div>
+        </div>
+        <div class="form-row">
+          <div class="field">
+            <label>Plan</label>
+            <select id="fm-plan">
+              <option value="Starter">Starter</option>
+              <option value="Standard">Standard</option>
+              <option value="Pro" selected>Pro</option>
+              <option value="Unlimited">Unlimited</option>
+            </select>
+          </div>
+          <div class="field"><label>Signals Limit</label><input type="number" id="fm-limit" value="100"></div>
+        </div>
+        <div class="form-row">
+          <div class="field"><label>Balance (₹)</label><input type="number" id="fm-balance" value="900"></div>
+          <div class="field">
+            <label>Status</label>
+            <select id="fm-status">
+              <option value="active">Active</option>
+              <option value="blocked">Blocked</option>
+              <option value="expired">Expired</option>
+            </select>
+          </div>
+        </div>
+        <div class="field"><label>Device ID (optional)</label><input type="text" id="fm-device" placeholder="Leave blank to auto-assign"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="document.getElementById('user-modal').hidden=true">Cancel</button>
+      <button class="btn btn-gold" onclick="saveUser()">Save User</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD PLAN MODAL -->
+<div class="modal-overlay" id="plan-modal" hidden onclick="if(event.target===this)this.hidden=true">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">New Plan</span>
+      <button class="modal-close" onclick="document.getElementById('plan-modal').hidden=true">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <div class="form-row">
+          <div class="field"><label>Plan Name</label><input type="text" id="pf-name" placeholder="e.g. Gold"></div>
+          <div class="field"><label>Signals</label><input type="number" id="pf-signals" placeholder="200"></div>
+        </div>
+        <div class="form-row">
+          <div class="field"><label>Price (₹)</label><input type="number" id="pf-price" placeholder="1200"></div>
+          <div class="field"><label>Duration (days)</label><input type="number" id="pf-days" value="30"></div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="document.getElementById('plan-modal').hidden=true">Cancel</button>
+      <button class="btn btn-gold" onclick="savePlan()">Create Plan</button>
+    </div>
+  </div>
+</div>
+
+<!-- PRODUCT MODAL -->
+<div class="modal-overlay" id="product-modal" hidden onclick="if(event.target===this)this.hidden=true">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="product-modal-title">New Product</span>
+      <button class="modal-close" onclick="document.getElementById('product-modal').hidden=true">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <div class="field"><label>Name</label><input type="text" id="prf-name" placeholder="e.g. Yaar Win Hack"></div>
+        <div class="field"><label>Image URL</label><input type="text" id="prf-image" placeholder="https://…/logo.png"></div>
+        <div class="field"><label>Activate URL</label><input type="text" id="prf-url" placeholder="https://…"></div>
+        <div class="field"><label>Sort order</label><input type="number" id="prf-sort" value="0"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="document.getElementById('product-modal').hidden=true">Cancel</button>
+      <button class="btn btn-gold" onclick="saveProduct()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- RESET PASSWORD MODAL -->
+<div class="modal-overlay" id="reset-modal" hidden onclick="if(event.target===this)this.hidden=true">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">Reset Password</span>
+      <button class="modal-close" onclick="document.getElementById('reset-modal').hidden=true">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="field"><label>New Password</label><input type="password" id="new-pass" placeholder="New password"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="document.getElementById('reset-modal').hidden=true">Cancel</button>
+      <button class="btn btn-gold" onclick="doResetPassword()">Reset</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ── CONFIG ────────────────────────────────────────────────────────────────────
+const BASE = '../admin_api/';
+let allUsers = [], editUserId = null, resetTargetId = null;
+let currentView = 'dashboard';
+
+// ── API HELPERS ───────────────────────────────────────────────────────────────
+async function api(endpoint, data = {}) {
+  const fd = new FormData();
+  for (const [k, v] of Object.entries(data)) fd.append(k, v);
+  try {
+    const r = await fetch(BASE + endpoint, { method: 'POST', body: fd });
+    return await r.json();
+  } catch(e) {
+    return { status: 'error', message: 'Network error' };
+  }
+}
+
+async function apiGet(endpoint) {
+  try {
+    const r = await fetch(BASE + endpoint);
+    return await r.json();
+  } catch(e) {
+    return { status: 'error', message: 'Network error' };
+  }
+}
+
+// ── AUTH ──────────────────────────────────────────────────────────────────────
+async function doLogin() {
+  const u = document.getElementById('adm-user').value.trim();
+  const p = document.getElementById('adm-pass').value;
+  const res = await api('auth.php', { action: 'login', username: u, password: p });
+  if (res.status === 'ok') {
+    document.getElementById('login-page').hidden = true;
+    document.getElementById('app').hidden = false;
+    loadDashboard();
+  } else {
+    document.getElementById('login-err').style.display = 'block';
+  }
+}
+
+async function doLogout() {
+  await api('auth.php', { action: 'logout' });
+  document.getElementById('app').hidden = true;
+  document.getElementById('login-page').hidden = false;
+  document.getElementById('adm-pass').value = '';
+}
+
+// ── NAVIGATION ────────────────────────────────────────────────────────────────
+document.querySelectorAll('.nav-item[data-view]').forEach(btn => {
+  btn.addEventListener('click', () => nav(btn.dataset.view));
+});
+
+function nav(view) {
+  currentView = view;
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-' + view).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(b => b.classList.toggle('active', b.dataset.view === view));
+  loadCurrentView();
+}
+
+function loadCurrentView() {
+  const loaders = {
+    dashboard: loadDashboard,
+    users: loadUsers,
+    plans: loadPlans,
+    products: loadProducts,
+    activity: loadActivity,
+    settings: loadSettings,
+    telegram: loadTelegram,
+  };
+  (loaders[currentView] || (() => {}))();
+}
+
+// ── DASHBOARD ─────────────────────────────────────────────────────────────────
+async function loadDashboard() {
+  const res = await apiGet('stats.php');
+  if (res.status !== 'ok') return;
+  document.getElementById('st-total').textContent  = res.total;
+  document.getElementById('st-active').textContent = res.active;
+  document.getElementById('st-sigs').textContent   = res.signals_today;
+  document.getElementById('st-rev').textContent    = '₹ ' + res.revenue.toLocaleString();
+  document.getElementById('st-new').textContent    = `+${res.new_today} today`;
+  document.getElementById('st-blocked-txt').textContent = `${res.blocked} blocked, ${res.expired} expired`;
+
+  const tbody = document.getElementById('dash-tbody');
+  tbody.innerHTML = (res.recent || []).map(u => `
+    <tr>
+      <td><strong>${esc(u.username)}</strong></td>
+      <td class="dim">${esc(u.plan)}</td>
+      <td>${u.signal_limit}</td>
+      <td>${badge(u.status)}</td>
+      <td class="dim">${u.created_at?.slice(0,10)||''}</td>
+    </tr>`).join('') || '<tr><td colspan="5" style="text-align:center;color:var(--text-dim);padding:20px;">No users yet</td></tr>';
+}
+
+// ── USERS ─────────────────────────────────────────────────────────────────────
+async function loadUsers() {
+  document.getElementById('users-tbody').innerHTML = '<tr class="loading-row"><td colspan="9"><div class="spinner"></div></td></tr>';
+  const res = await api('users.php', { action: 'list' });
+  if (res.status !== 'ok') { toast('Failed to load users', 'err'); return; }
+  allUsers = res.users || [];
+  document.getElementById('users-count').textContent = `${allUsers.length} total`;
+  filterUsers();
+}
+
+function filterUsers() {
+  const q = document.getElementById('user-search').value.toLowerCase();
+  const f = document.getElementById('user-filter').value;
+  const filtered = allUsers.filter(u =>
+    (!q || u.username.toLowerCase().includes(q) || (u.device_id||'').toLowerCase().includes(q)) &&
+    (f === 'all' || u.status === f)
+  );
+  const tbody = document.getElementById('users-tbody');
+  tbody.innerHTML = filtered.length === 0
+    ? '<tr><td colspan="9" style="text-align:center;color:var(--text-dim);padding:24px;">No users found</td></tr>'
+    : filtered.map((u, i) => `<tr>
+        <td class="dim">${i+1}</td>
+        <td><strong>${esc(u.username)}</strong></td>
+        <td><code>${esc(u.device_id||'—')}</code></td>
+        <td class="dim">${esc(u.plan)}</td>
+        <td style="font-variant-numeric:tabular-nums;">
+          <div class="topup-row">
+            ${u.signal_limit}
+            <input type="number" id="topup-${u.id}" value="50" min="1">
+            <button class="btn btn-green btn-sm" onclick="topUp(${u.id})">+Add</button>
+          </div>
+        </td>
+        <td>₹ ${u.balance}</td>
+        <td>${badge(u.status)}</td>
+        <td class="dim">${(u.created_at||'').slice(0,10)}</td>
+        <td>
+          <div style="display:flex;gap:4px;flex-wrap:wrap;">
+            <button class="btn btn-outline btn-sm" onclick="editUser(${u.id})">Edit</button>
+            <button class="btn btn-sm" style="background:rgba(68,136,204,.1);border:1px solid rgba(68,136,204,.2);color:var(--blue);font-size:.62rem;padding:5px 10px;" onclick="openReset(${u.id})">Pwd</button>
+            ${u.status==='active'
+              ? `<button class="btn btn-danger btn-sm" onclick="blockUser(${u.id})">Block</button>`
+              : `<button class="btn btn-green btn-sm" onclick="unblockUser(${u.id})">Unblock</button>`}
+            <button class="btn btn-danger btn-sm" onclick="deleteUser(${u.id})">Del</button>
+          </div>
+        </td>
+      </tr>`).join('');
+}
+
+function openAddUser() {
+  editUserId = null;
+  document.getElementById('user-modal-title').textContent = 'Add User';
+  ['fm-username','fm-device'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('fm-password').value = '';
+  document.getElementById('fm-limit').value = 100;
+  document.getElementById('fm-balance').value = 900;
+  document.getElementById('fm-plan').value = 'Pro';
+  document.getElementById('fm-status').value = 'active';
+  document.getElementById('user-modal').hidden = false;
+}
+
+function editUser(id) {
+  const u = allUsers.find(x => x.id == id);
+  if (!u) return;
+  editUserId = id;
+  document.getElementById('user-modal-title').textContent = 'Edit User';
+  document.getElementById('fm-username').value = u.username;
+  document.getElementById('fm-password').value = '';
+  document.getElementById('fm-plan').value = u.plan;
+  document.getElementById('fm-limit').value = u.signal_limit;
+  document.getElementById('fm-balance').value = u.balance;
+  document.getElementById('fm-status').value = u.status;
+  document.getElementById('fm-device').value = u.device_id || '';
+  document.getElementById('user-modal').hidden = false;
+}
+
+async function saveUser() {
+  const data = {
+    username: document.getElementById('fm-username').value.trim(),
+    password: document.getElementById('fm-password').value,
+    plan:     document.getElementById('fm-plan').value,
+    limit:    document.getElementById('fm-limit').value,
+    balance:  document.getElementById('fm-balance').value,
+    status:   document.getElementById('fm-status').value,
+    device_id:document.getElementById('fm-device').value.trim(),
+  };
+  if (!data.username) { toast('Username required','err'); return; }
+
+  let res;
+  if (editUserId) {
+    res = await api('users.php', { action:'update', id: editUserId, ...data });
+  } else {
+    if (!data.password) { toast('Password required','err'); return; }
+    res = await api('users.php', { action:'add', ...data });
+  }
+  if (res.status !== 'ok') { toast(res.message||'Error','err'); return; }
+  document.getElementById('user-modal').hidden = true;
+  toast(editUserId ? 'User updated' : 'User added','ok');
+  loadUsers();
+}
+
+async function deleteUser(id) {
+  const u = allUsers.find(x => x.id == id);
+  if (!confirm(`Delete ${u?.username}?`)) return;
+  const res = await api('users.php', { action:'delete', id });
+  if (res.status==='ok') { toast('User deleted','ok'); loadUsers(); }
+  else toast(res.message||'Error','err');
+}
+
+async function blockUser(id) {
+  const res = await api('users.php', { action:'block', id });
+  if (res.status==='ok') { toast('User blocked','ok'); loadUsers(); }
+}
+
+async function unblockUser(id) {
+  const res = await api('users.php', { action:'unblock', id });
+  if (res.status==='ok') { toast('User unblocked','ok'); loadUsers(); }
+}
+
+async function topUp(id) {
+  const add = +document.getElementById('topup-'+id).value;
+  if (!add || add < 1) return;
+  const res = await api('users.php', { action:'topup', id, signals: add });
+  if (res.status==='ok') { toast(`+${add} signals added`,'ok'); loadUsers(); }
+  else toast(res.message||'Error','err');
+}
+
+function openReset(id) {
+  resetTargetId = id;
+  document.getElementById('new-pass').value = '';
+  document.getElementById('reset-modal').hidden = false;
+}
+
+async function doResetPassword() {
+  const pass = document.getElementById('new-pass').value;
+  if (!pass) { toast('Enter a password','err'); return; }
+  const res = await api('users.php', { action:'reset_password', id: resetTargetId, password: pass });
+  if (res.status==='ok') { toast('Password reset','ok'); document.getElementById('reset-modal').hidden = true; }
+  else toast(res.message||'Error','err');
+}
+
+// ── PLANS ─────────────────────────────────────────────────────────────────────
+async function loadPlans() {
+  document.getElementById('plans-grid').innerHTML = '<div class="spinner"></div>';
+  const res = await api('plans.php', { action:'list' });
+  if (res.status !== 'ok') return;
+  const grid = document.getElementById('plans-grid');
+  grid.innerHTML = (res.plans || []).map(p => `
+    <div class="plan-card ${p.featured=='1'?'featured':''}">
+      ${p.featured=='1' ? '<span class="badge badge-gold" style="position:absolute;top:14px;right:14px;">Popular</span>' : ''}
+      <p class="plan-name">${esc(p.name)}</p>
+      <p class="plan-signals">${p.signals >= 9999 ? '∞' : p.signals} <span>signals</span></p>
+      <p class="plan-price">₹ ${p.price} · ${p.days} days</p>
+      <div class="plan-actions">
+        <button class="btn btn-outline btn-sm" onclick="setFeatured(${p.id})">★ Feature</button>
+        <button class="btn btn-danger btn-sm" onclick="deletePlan(${p.id})">Delete</button>
+      </div>
+    </div>`).join('') || '<p style="color:var(--text-dim);">No plans yet.</p>';
+}
+
+function openAddPlan() { document.getElementById('plan-modal').hidden = false; }
+
+async function savePlan() {
+  const name    = document.getElementById('pf-name').value.trim();
+  const signals = document.getElementById('pf-signals').value;
+  const price   = document.getElementById('pf-price').value;
+  const days    = document.getElementById('pf-days').value;
+  if (!name||!signals||!price) { toast('Fill all fields','err'); return; }
+  const res = await api('plans.php', { action:'add', name, signals, price, days });
+  if (res.status==='ok') { document.getElementById('plan-modal').hidden=true; toast('Plan created','ok'); loadPlans(); }
+  else toast(res.message||'Error','err');
+}
+
+async function deletePlan(id) {
+  if (!confirm('Delete this plan?')) return;
+  const res = await api('plans.php', { action:'delete', id });
+  if (res.status==='ok') { toast('Plan deleted','ok'); loadPlans(); }
+}
+
+async function setFeatured(id) {
+  const res = await api('plans.php', { action:'set_featured', id });
+  if (res.status==='ok') { toast('Featured updated','ok'); loadPlans(); }
+}
+
+// ── PRODUCTS ──────────────────────────────────────────────────────────────────
+let editProductId = null;
+
+async function loadProducts() {
+  document.getElementById('products-tbody').innerHTML = '<tr class="loading-row"><td colspan="6"><div class="spinner"></div></td></tr>';
+  const res = await api('products.php', { action:'list' });
+  if (res.status !== 'ok') { toast(res.message||'Error','err'); return; }
+  const tb = document.getElementById('products-tbody');
+  tb.innerHTML = (res.products || []).map(p => `
+    <tr>
+      <td>${p.sort}</td>
+      <td>${p.image ? `<img src="${esc(p.image)}" style="width:34px;height:34px;border-radius:8px;object-fit:cover;" onerror="this.style.display='none'">` : '—'}</td>
+      <td>${esc(p.name)}</td>
+      <td style="max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><a href="${esc(p.url)}" target="_blank" style="color:var(--blue);">${esc(p.url||'')}</a></td>
+      <td>${p.active=='1' ? '<span class="badge" style="color:var(--green);">Active</span>' : '<span class="badge" style="color:var(--text-dim);">Hidden</span>'}</td>
+      <td>
+        <button class="btn btn-outline btn-sm" onclick='editProduct(${JSON.stringify(p)})'>Edit</button>
+        <button class="btn btn-outline btn-sm" onclick="toggleProduct(${p.id})">${p.active=='1'?'Hide':'Show'}</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteProduct(${p.id})">Del</button>
+      </td>
+    </tr>`).join('') || '<tr><td colspan="6" style="color:var(--text-dim);padding:20px;">No products yet.</td></tr>';
+
+  // Load banner fields from config
+  const cfg = await api('config.php', { action:'get' });
+  if (cfg.status === 'ok') {
+    document.getElementById('banner_name').value  = cfg.config.banner_name  || '';
+    document.getElementById('banner_image').value = cfg.config.banner_image || '';
+    document.getElementById('banner_url').value   = cfg.config.banner_url   || '';
+  }
+}
+
+function openAddProduct() {
+  editProductId = null;
+  document.getElementById('product-modal-title').textContent = 'New Product';
+  document.getElementById('prf-name').value  = '';
+  document.getElementById('prf-image').value = '';
+  document.getElementById('prf-url').value   = '';
+  document.getElementById('prf-sort').value  = '0';
+  document.getElementById('product-modal').hidden = false;
+}
+
+function editProduct(p) {
+  editProductId = p.id;
+  document.getElementById('product-modal-title').textContent = 'Edit Product';
+  document.getElementById('prf-name').value  = p.name || '';
+  document.getElementById('prf-image').value = p.image || '';
+  document.getElementById('prf-url').value   = p.url || '';
+  document.getElementById('prf-sort').value  = p.sort || '0';
+  document.getElementById('product-modal').hidden = false;
+}
+
+async function saveProduct() {
+  const name  = document.getElementById('prf-name').value.trim();
+  const image = document.getElementById('prf-image').value.trim();
+  const url   = document.getElementById('prf-url').value.trim();
+  const sort  = document.getElementById('prf-sort').value || 0;
+  if (!name) { toast('Name is required','err'); return; }
+  const payload = editProductId
+    ? { action:'update', id: editProductId, name, image, url, sort }
+    : { action:'add', name, image, url, sort };
+  const res = await api('products.php', payload);
+  if (res.status==='ok') { document.getElementById('product-modal').hidden=true; toast('Saved','ok'); loadProducts(); }
+  else toast(res.message||'Error','err');
+}
+
+async function toggleProduct(id) {
+  const res = await api('products.php', { action:'toggle', id });
+  if (res.status==='ok') { loadProducts(); }
+}
+
+async function deleteProduct(id) {
+  if (!confirm('Delete this product?')) return;
+  const res = await api('products.php', { action:'delete', id });
+  if (res.status==='ok') { toast('Deleted','ok'); loadProducts(); }
+}
+
+async function saveBanner() {
+  const name  = document.getElementById('banner_name').value.trim();
+  const image = document.getElementById('banner_image').value.trim();
+  const url   = document.getElementById('banner_url').value.trim();
+  await api('config.php', { action:'set', key:'banner_name',  value:name });
+  await api('config.php', { action:'set', key:'banner_image', value:image });
+  await api('config.php', { action:'set', key:'banner_url',   value:url });
+  toast('Banner saved','ok');
+}
+
+// ── ACTIVITY ──────────────────────────────────────────────────────────────────
+async function loadActivity() {
+  document.getElementById('activity-list').innerHTML = '<div class="spinner" style="margin:24px auto;"></div>';
+  const res = await apiGet('log.php?limit=50');
+  if (res.status !== 'ok') return;
+  const colors = { login:'var(--green)', signal:'var(--gold)', register:'var(--blue)', blocked:'var(--red)', admin:'var(--violet)' };
+  document.getElementById('activity-list').innerHTML = (res.log || []).map(l => `
+    <div class="log-item">
+      <div class="log-dot" style="background:${colors[l.type]||'var(--text-dim)'}"></div>
+      <div class="log-msg">${esc(l.message)}</div>
+      <div class="log-time">${(l.created_at||'').slice(0,16).replace('T',' ')}</div>
+    </div>`).join('') || '<p style="color:var(--text-dim);padding:20px 0;">No activity yet</p>';
+}
+
+// ── SETTINGS ──────────────────────────────────────────────────────────────────
+async function loadSettings() {
+  const res = await api('config.php', { action:'get' });
+  if (res.status !== 'ok') return;
+  const c = res.config;
+  document.getElementById('tog-maintenance').checked = c.maintenance_mode === '1';
+  document.getElementById('tog-reg').checked          = c.registration_open !== '0';
+  document.getElementById('cfg-override').value       = c.signal_override || '';
+  document.getElementById('cfg-version').value        = c.app_version || '1.0.0';
+}
+
+async function saveCfg(key, value) {
+  const res = await api('config.php', { action:'set', key, value });
+  if (res.status==='ok') toast('Saved','ok'); else toast('Error saving','err');
+}
+
+// ── TELEGRAM ──────────────────────────────────────────────────────────────────
+async function loadTelegram() {
+  const res = await api('config.php', { action:'get' });
+  if (res.status !== 'ok') return;
+  document.getElementById('tg-handle').value = res.config.telegram_handle || '@noraphillip';
+  document.getElementById('tg-link').value   = res.config.telegram_url    || 'https://t.me/noraphillip';
+}
+
+async function saveTelegram() {
+  const res = await api('config.php', {
+    action: 'batch',
+    telegram_handle: document.getElementById('tg-handle').value.trim(),
+    telegram_url:    document.getElementById('tg-link').value.trim(),
+  });
+  if (res.status==='ok') toast('Telegram settings saved','ok'); else toast('Error','err');
+}
+
+// ── HELPERS ───────────────────────────────────────────────────────────────────
+function badge(status) {
+  const map = { active:'badge-green', blocked:'badge-red', expired:'badge-dim' };
+  return `<span class="badge ${map[status]||'badge-dim'}">${status}</span>`;
+}
+
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+let toastTimer;
+function toast(msg, type='ok') {
+  const el = document.getElementById('toast');
+  el.textContent = (type==='ok'?'✓ ':'✕ ') + msg;
+  el.className = 'toast ' + type + ' show';
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 3000);
+}
+
+// ── BOOT ──────────────────────────────────────────────────────────────────────
+// Check if already logged in (session active)
+(async () => {
+  const res = await api('auth.php', { action: 'check' });
+  if (res.status === 'ok') {
+    document.getElementById('login-page').hidden = true;
+    document.getElementById('app').hidden = false;
+    loadDashboard();
+  }
+})();
+</script>
+</body>
+</html>

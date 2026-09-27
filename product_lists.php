@@ -19,11 +19,13 @@ CREATE TABLE IF NOT EXISTS products (
 // Seed defaults once if the table is empty.
 $count = (int)$db->query("SELECT COUNT(*) AS c FROM products")->fetch()['c'];
 if ($count === 0) {
+    // Games from the app screenshots. Edit these (name, logo, activate link)
+    // any time in the admin panel → Products.
     $seed = [
-        ['Yaar Win Hack',   'https://i.ibb.co/6H7tYyy/yaarwin.png',  'https://yaarwin.com'],
-        ['Jai Club Hack',   'https://i.ibb.co/6H7tYyy/jaiclub.png',  'https://jaiclub.com'],
-        ['Jalwa Game Hack', 'https://i.ibb.co/6H7tYyy/jalwa.png',    'https://jalwagame.com'],
-        ['Tiranga Lottery', 'https://i.ibb.co/6H7tYyy/tiranga.png',  'https://tirangagame.com'],
+        ['Yaar Win Hack',   '', 'https://www.yaarwin.com'],
+        ['Jai Club Hack',   '', 'https://www.jaiclub.com'],
+        ['Jalwa Game Hack', '', 'https://www.jalwa.game'],
+        ['Tiranga Lottery', '', 'https://www.tirangagames.com'],
     ];
     $ins = $db->prepare("INSERT INTO products (name, image, url, sort) VALUES (?,?,?,?)");
     foreach ($seed as $i => $p) {
