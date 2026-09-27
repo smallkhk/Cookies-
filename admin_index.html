@@ -197,7 +197,7 @@ select.filter:focus{border-color:var(--gold);}
     <div class="login-err" id="login-err">Incorrect username or password.</div>
     <div class="form-group" style="margin-bottom:20px;">
       <div class="field"><label>Username</label><input type="text" id="adm-user" placeholder="admin" autocomplete="off"></div>
-      <div class="field"><label>Password</label><input type="password" id="adm-pass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
+      <div class="field"><label>Password</label><input type="password" id="adm-pass" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;" onkeydown="if(event.key==='Enter')doLogin()"></div>
     </div>
     <button class="btn btn-gold" style="width:100%;justify-content:center;" onclick="doLogin()">Sign In</button>
     <p style="text-align:center;font-size:.65rem;color:var(--text-dim);margin-top:16px;">
@@ -274,10 +274,10 @@ select.filter:focus{border-color:var(--gold);}
           </button>
         </div>
         <div class="stats-row" id="stats-row">
-          <div class="stat-tile"><p class="stat-label">Total Users</p><p class="stat-value" id="st-total">—</p><p class="stat-sub" id="st-new">loading…</p></div>
-          <div class="stat-tile"><p class="stat-label">Active</p><p class="stat-value green" id="st-active">—</p><p class="stat-sub" id="st-blocked-txt">—</p></div>
-          <div class="stat-tile"><p class="stat-label">Signals Today</p><p class="stat-value gold" id="st-sigs">—</p><p class="stat-sub">API calls today</p></div>
-          <div class="stat-tile"><p class="stat-label">Total Balance</p><p class="stat-value gold" id="st-rev">—</p><p class="stat-sub">Sum of all user balances</p></div>
+          <div class="stat-tile"><p class="stat-label">Total Users</p><p class="stat-value" id="st-total">&mdash;</p><p class="stat-sub" id="st-new">loading...</p></div>
+          <div class="stat-tile"><p class="stat-label">Active</p><p class="stat-value green" id="st-active">&mdash;</p><p class="stat-sub" id="st-blocked-txt">&mdash;</p></div>
+          <div class="stat-tile"><p class="stat-label">Signals Today</p><p class="stat-value gold" id="st-sigs">&mdash;</p><p class="stat-sub">API calls today</p></div>
+          <div class="stat-tile"><p class="stat-label">Total Balance</p><p class="stat-value gold" id="st-rev">&mdash;</p><p class="stat-sub">Sum of all user balances</p></div>
         </div>
         <div class="card">
           <div class="card-header">
@@ -305,7 +305,7 @@ select.filter:focus{border-color:var(--gold);}
             <div class="bar" style="flex:1;">
               <div class="search-wrap">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                <input class="search-input" id="user-search" placeholder="Search username, device…" oninput="filterUsers()">
+                <input class="search-input" id="user-search" placeholder="Search username, device..." oninput="filterUsers()">
               </div>
               <select class="filter" id="user-filter" onchange="filterUsers()">
                 <option value="all">All Status</option>
@@ -354,7 +354,7 @@ select.filter:focus{border-color:var(--gold);}
           <div class="card-header"><span class="card-title">Top Banner (get_main_product)</span></div>
           <div style="padding:16px 20px;display:grid;gap:12px;max-width:560px;">
             <label class="fld"><span>Banner name</span><input id="banner_name" placeholder="VEERGAME HACK"></label>
-            <label class="fld"><span>Banner image URL</span><input id="banner_image" placeholder="https://…/veergame.png"></label>
+            <label class="fld"><span>Banner image URL</span><input id="banner_image" placeholder="https://.../veergame.png"></label>
             <label class="fld"><span>Banner activate URL</span><input id="banner_url" placeholder="https://www.veergame24.com"></label>
             <button class="btn btn-gold" style="justify-self:start;" onclick="saveBanner()">Save Banner</button>
           </div>
@@ -384,7 +384,7 @@ select.filter:focus{border-color:var(--gold);}
             <label class="toggle"><input type="checkbox" id="tog-reg" checked onchange="saveCfg('registration_open',this.checked?'1':'0')"><span class="toggle-track"></span></label>
           </div>
           <div class="setting-row">
-            <div class="setting-info"><p class="setting-label">Signal Override</p><p class="setting-desc">Force all users to receive this signal (BUY / SELL / HOLD — leave empty for random)</p></div>
+            <div class="setting-info"><p class="setting-label">Signal Override</p><p class="setting-desc">Force all users to receive this signal (BUY / SELL / HOLD &mdash; leave empty for random)</p></div>
             <input class="setting-input" type="text" id="cfg-override" placeholder="e.g. BUY" onchange="saveCfg('signal_override',this.value.trim())">
           </div>
           <div class="setting-row">
@@ -410,7 +410,7 @@ select.filter:focus{border-color:var(--gold);}
           <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap;">
             <button class="btn btn-gold" onclick="saveTelegram()">Save Telegram Settings</button>
             <a href="https://t.me/noraphillip" target="_blank" rel="noopener">
-              <button class="btn btn-outline" type="button">Open Channel →</button>
+              <button class="btn btn-outline" type="button">Open Channel &rarr;</button>
             </a>
           </div>
         </div>
@@ -439,7 +439,7 @@ select.filter:focus{border-color:var(--gold);}
   <div class="modal">
     <div class="modal-header">
       <span class="modal-title" id="user-modal-title">Add User</span>
-      <button class="modal-close" onclick="document.getElementById('user-modal').hidden=true">✕</button>
+      <button class="modal-close" onclick="document.getElementById('user-modal').hidden=true">&times;</button>
     </div>
     <div class="modal-body">
       <div class="form-group">
@@ -460,7 +460,7 @@ select.filter:focus{border-color:var(--gold);}
           <div class="field"><label>Signals Limit</label><input type="number" id="fm-limit" value="100"></div>
         </div>
         <div class="form-row">
-          <div class="field"><label>Balance (₹)</label><input type="number" id="fm-balance" value="900"></div>
+          <div class="field"><label>Balance (&#8377;)</label><input type="number" id="fm-balance" value="900"></div>
           <div class="field">
             <label>Status</label>
             <select id="fm-status">
@@ -485,7 +485,7 @@ select.filter:focus{border-color:var(--gold);}
   <div class="modal">
     <div class="modal-header">
       <span class="modal-title">New Plan</span>
-      <button class="modal-close" onclick="document.getElementById('plan-modal').hidden=true">✕</button>
+      <button class="modal-close" onclick="document.getElementById('plan-modal').hidden=true">&times;</button>
     </div>
     <div class="modal-body">
       <div class="form-group">
@@ -494,7 +494,7 @@ select.filter:focus{border-color:var(--gold);}
           <div class="field"><label>Signals</label><input type="number" id="pf-signals" placeholder="200"></div>
         </div>
         <div class="form-row">
-          <div class="field"><label>Price (₹)</label><input type="number" id="pf-price" placeholder="1200"></div>
+          <div class="field"><label>Price (&#8377;)</label><input type="number" id="pf-price" placeholder="1200"></div>
           <div class="field"><label>Duration (days)</label><input type="number" id="pf-days" value="30"></div>
         </div>
       </div>
@@ -511,13 +511,13 @@ select.filter:focus{border-color:var(--gold);}
   <div class="modal">
     <div class="modal-header">
       <span class="modal-title" id="product-modal-title">New Product</span>
-      <button class="modal-close" onclick="document.getElementById('product-modal').hidden=true">✕</button>
+      <button class="modal-close" onclick="document.getElementById('product-modal').hidden=true">&times;</button>
     </div>
     <div class="modal-body">
       <div class="form-group">
         <div class="field"><label>Name</label><input type="text" id="prf-name" placeholder="e.g. Yaar Win Hack"></div>
-        <div class="field"><label>Image URL</label><input type="text" id="prf-image" placeholder="https://…/logo.png"></div>
-        <div class="field"><label>Activate URL</label><input type="text" id="prf-url" placeholder="https://…"></div>
+        <div class="field"><label>Image URL</label><input type="text" id="prf-image" placeholder="https://.../logo.png"></div>
+        <div class="field"><label>Activate URL</label><input type="text" id="prf-url" placeholder="https://..."></div>
         <div class="field"><label>Sort order</label><input type="number" id="prf-sort" value="0"></div>
       </div>
     </div>
@@ -533,7 +533,7 @@ select.filter:focus{border-color:var(--gold);}
   <div class="modal">
     <div class="modal-header">
       <span class="modal-title">Reset Password</span>
-      <button class="modal-close" onclick="document.getElementById('reset-modal').hidden=true">✕</button>
+      <button class="modal-close" onclick="document.getElementById('reset-modal').hidden=true">&times;</button>
     </div>
     <div class="modal-body">
       <div class="field"><label>New Password</label><input type="password" id="new-pass" placeholder="New password"></div>
@@ -549,12 +549,12 @@ select.filter:focus{border-color:var(--gold);}
 <div class="toast" id="toast"></div>
 
 <script>
-// ── CONFIG ────────────────────────────────────────────────────────────────────
+// -- CONFIG --------------------------------------------------------------------
 const BASE = '../admin_api/';
 let allUsers = [], editUserId = null, resetTargetId = null;
 let currentView = 'dashboard';
 
-// ── API HELPERS ───────────────────────────────────────────────────────────────
+// -- API HELPERS ---------------------------------------------------------------
 async function api(endpoint, data = {}) {
   const fd = new FormData();
   for (const [k, v] of Object.entries(data)) fd.append(k, v);
@@ -575,7 +575,7 @@ async function apiGet(endpoint) {
   }
 }
 
-// ── AUTH ──────────────────────────────────────────────────────────────────────
+// -- AUTH ----------------------------------------------------------------------
 async function doLogin() {
   const u = document.getElementById('adm-user').value.trim();
   const p = document.getElementById('adm-pass').value;
@@ -596,7 +596,7 @@ async function doLogout() {
   document.getElementById('adm-pass').value = '';
 }
 
-// ── NAVIGATION ────────────────────────────────────────────────────────────────
+// -- NAVIGATION ----------------------------------------------------------------
 document.querySelectorAll('.nav-item[data-view]').forEach(btn => {
   btn.addEventListener('click', () => nav(btn.dataset.view));
 });
@@ -622,14 +622,14 @@ function loadCurrentView() {
   (loaders[currentView] || (() => {}))();
 }
 
-// ── DASHBOARD ─────────────────────────────────────────────────────────────────
+// -- DASHBOARD -----------------------------------------------------------------
 async function loadDashboard() {
   const res = await apiGet('stats.php');
   if (res.status !== 'ok') return;
   document.getElementById('st-total').textContent  = res.total;
   document.getElementById('st-active').textContent = res.active;
   document.getElementById('st-sigs').textContent   = res.signals_today;
-  document.getElementById('st-rev').textContent    = '₹ ' + res.revenue.toLocaleString();
+  document.getElementById('st-rev').textContent    = '\u20B9 ' + res.revenue.toLocaleString();
   document.getElementById('st-new').textContent    = `+${res.new_today} today`;
   document.getElementById('st-blocked-txt').textContent = `${res.blocked} blocked, ${res.expired} expired`;
 
@@ -644,7 +644,7 @@ async function loadDashboard() {
     </tr>`).join('') || '<tr><td colspan="5" style="text-align:center;color:var(--text-dim);padding:20px;">No users yet</td></tr>';
 }
 
-// ── USERS ─────────────────────────────────────────────────────────────────────
+// -- USERS ---------------------------------------------------------------------
 async function loadUsers() {
   document.getElementById('users-tbody').innerHTML = '<tr class="loading-row"><td colspan="9"><div class="spinner"></div></td></tr>';
   const res = await api('users.php', { action: 'list' });
@@ -667,7 +667,7 @@ function filterUsers() {
     : filtered.map((u, i) => `<tr>
         <td class="dim">${i+1}</td>
         <td><strong>${esc(u.username)}</strong></td>
-        <td><code>${esc(u.device_id||'—')}</code></td>
+        <td><code>${esc(u.device_id||'\u2014')}</code></td>
         <td class="dim">${esc(u.plan)}</td>
         <td style="font-variant-numeric:tabular-nums;">
           <div class="topup-row">
@@ -676,7 +676,7 @@ function filterUsers() {
             <button class="btn btn-green btn-sm" onclick="topUp(${u.id})">+Add</button>
           </div>
         </td>
-        <td>₹ ${u.balance}</td>
+        <td>\u20B9 ${u.balance}</td>
         <td>${badge(u.status)}</td>
         <td class="dim">${(u.created_at||'').slice(0,10)}</td>
         <td>
@@ -784,7 +784,7 @@ async function doResetPassword() {
   else toast(res.message||'Error','err');
 }
 
-// ── PLANS ─────────────────────────────────────────────────────────────────────
+// -- PLANS ---------------------------------------------------------------------
 async function loadPlans() {
   document.getElementById('plans-grid').innerHTML = '<div class="spinner"></div>';
   const res = await api('plans.php', { action:'list' });
@@ -794,10 +794,10 @@ async function loadPlans() {
     <div class="plan-card ${p.featured=='1'?'featured':''}">
       ${p.featured=='1' ? '<span class="badge badge-gold" style="position:absolute;top:14px;right:14px;">Popular</span>' : ''}
       <p class="plan-name">${esc(p.name)}</p>
-      <p class="plan-signals">${p.signals >= 9999 ? '∞' : p.signals} <span>signals</span></p>
-      <p class="plan-price">₹ ${p.price} · ${p.days} days</p>
+      <p class="plan-signals">${p.signals >= 9999 ? '\u221E' : p.signals} <span>signals</span></p>
+      <p class="plan-price">\u20B9 ${p.price} \u00B7 ${p.days} days</p>
       <div class="plan-actions">
-        <button class="btn btn-outline btn-sm" onclick="setFeatured(${p.id})">★ Feature</button>
+        <button class="btn btn-outline btn-sm" onclick="setFeatured(${p.id})">\u2605 Feature</button>
         <button class="btn btn-danger btn-sm" onclick="deletePlan(${p.id})">Delete</button>
       </div>
     </div>`).join('') || '<p style="color:var(--text-dim);">No plans yet.</p>';
@@ -827,7 +827,7 @@ async function setFeatured(id) {
   if (res.status==='ok') { toast('Featured updated','ok'); loadPlans(); }
 }
 
-// ── PRODUCTS ──────────────────────────────────────────────────────────────────
+// -- PRODUCTS ------------------------------------------------------------------
 let editProductId = null;
 
 async function loadProducts() {
@@ -838,7 +838,7 @@ async function loadProducts() {
   tb.innerHTML = (res.products || []).map(p => `
     <tr>
       <td>${p.sort}</td>
-      <td>${p.image ? `<img src="${esc(p.image)}" style="width:34px;height:34px;border-radius:8px;object-fit:cover;" onerror="this.style.display='none'">` : '—'}</td>
+      <td>${p.image ? `<img src="${esc(p.image)}" style="width:34px;height:34px;border-radius:8px;object-fit:cover;" onerror="this.style.display='none'">` : '\u2014'}</td>
       <td>${esc(p.name)}</td>
       <td style="max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><a href="${esc(p.url)}" target="_blank" style="color:var(--blue);">${esc(p.url||'')}</a></td>
       <td>${p.active=='1' ? '<span class="badge" style="color:var(--green);">Active</span>' : '<span class="badge" style="color:var(--text-dim);">Hidden</span>'}</td>
@@ -913,7 +913,7 @@ async function saveBanner() {
   toast('Banner saved','ok');
 }
 
-// ── ACTIVITY ──────────────────────────────────────────────────────────────────
+// -- ACTIVITY ------------------------------------------------------------------
 async function loadActivity() {
   document.getElementById('activity-list').innerHTML = '<div class="spinner" style="margin:24px auto;"></div>';
   const res = await apiGet('log.php?limit=50');
@@ -927,7 +927,7 @@ async function loadActivity() {
     </div>`).join('') || '<p style="color:var(--text-dim);padding:20px 0;">No activity yet</p>';
 }
 
-// ── SETTINGS ──────────────────────────────────────────────────────────────────
+// -- SETTINGS ------------------------------------------------------------------
 async function loadSettings() {
   const res = await api('config.php', { action:'get' });
   if (res.status !== 'ok') return;
@@ -943,7 +943,7 @@ async function saveCfg(key, value) {
   if (res.status==='ok') toast('Saved','ok'); else toast('Error saving','err');
 }
 
-// ── TELEGRAM ──────────────────────────────────────────────────────────────────
+// -- TELEGRAM ------------------------------------------------------------------
 async function loadTelegram() {
   const res = await api('config.php', { action:'get' });
   if (res.status !== 'ok') return;
@@ -960,7 +960,7 @@ async function saveTelegram() {
   if (res.status==='ok') toast('Telegram settings saved','ok'); else toast('Error','err');
 }
 
-// ── HELPERS ───────────────────────────────────────────────────────────────────
+// -- HELPERS -------------------------------------------------------------------
 function badge(status) {
   const map = { active:'badge-green', blocked:'badge-red', expired:'badge-dim' };
   return `<span class="badge ${map[status]||'badge-dim'}">${status}</span>`;
@@ -973,13 +973,13 @@ function esc(s) {
 let toastTimer;
 function toast(msg, type='ok') {
   const el = document.getElementById('toast');
-  el.textContent = (type==='ok'?'✓ ':'✕ ') + msg;
+  el.textContent = (type==='ok'?'\u2713 ':'\u2715 ') + msg;
   el.className = 'toast ' + type + ' show';
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => el.classList.remove('show'), 3000);
 }
 
-// ── BOOT ──────────────────────────────────────────────────────────────────────
+// -- BOOT ----------------------------------------------------------------------
 // Check if already logged in (session active)
 (async () => {
   const res = await api('auth.php', { action: 'check' });
