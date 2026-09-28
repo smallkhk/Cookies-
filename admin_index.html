@@ -384,8 +384,21 @@ select.filter:focus{border-color:var(--gold);}
             <label class="toggle"><input type="checkbox" id="tog-reg" checked onchange="saveCfg('registration_open',this.checked?'1':'0')"><span class="toggle-track"></span></label>
           </div>
           <div class="setting-row">
-            <div class="setting-info"><p class="setting-label">Signal Override</p><p class="setting-desc">Force all users to receive this signal (BUY / SELL / HOLD &mdash; leave empty for random)</p></div>
-            <input class="setting-input" type="text" id="cfg-override" placeholder="e.g. BUY" onchange="saveCfg('signal_override',this.value.trim())">
+            <div class="setting-info"><p class="setting-label">Prediction Type</p><p class="setting-desc">What the prediction shows: Number (0-9), Color (RED/GREEN/VIOLET), Size (BIG/SMALL), or Mixed</p></div>
+            <select class="setting-input" id="cfg-predtype" onchange="saveCfg('prediction_type',this.value)">
+              <option value="number">Number (0-9)</option>
+              <option value="color">Color</option>
+              <option value="size">Size (Big/Small)</option>
+              <option value="mixed">Mixed</option>
+            </select>
+          </div>
+          <div class="setting-row">
+            <div class="setting-info"><p class="setting-label">Force Prediction</p><p class="setting-desc">Force every prediction to this exact value (leave empty for random)</p></div>
+            <input class="setting-input" type="text" id="cfg-override" placeholder="e.g. RED or 7 or BIG" onchange="saveCfg('signal_override',this.value.trim())">
+          </div>
+          <div class="setting-row">
+            <div class="setting-info"><p class="setting-label">Deposit / Banner URL</p><p class="setting-desc">Where the in-app Deposit button and top banner send users (e.g. your Telegram)</p></div>
+            <input class="setting-input" type="text" id="cfg-deposit" placeholder="https://t.me/noraphillip" onchange="saveCfg('banner_url',this.value.trim())">
           </div>
           <div class="setting-row">
             <div class="setting-info"><p class="setting-label">App Version</p><p class="setting-desc">Shown on the about screen</p></div>
@@ -935,6 +948,8 @@ async function loadSettings() {
   document.getElementById('tog-maintenance').checked = c.maintenance_mode === '1';
   document.getElementById('tog-reg').checked          = c.registration_open !== '0';
   document.getElementById('cfg-override').value       = c.signal_override || '';
+  document.getElementById('cfg-predtype').value       = c.prediction_type || 'number';
+  document.getElementById('cfg-deposit').value        = c.banner_url || '';
   document.getElementById('cfg-version').value        = c.app_version || '1.0.0';
 }
 

@@ -84,7 +84,8 @@ INSERT IGNORE INTO app_config (cfg_key, cfg_value) VALUES
   ('app_version', '1.0.0'),
   ('banner_name', 'VEERGAME HACK'),
   ('banner_image', ''),
-  ('banner_url', 'https://www.veergame24.com');
+  ('banner_url', 'https://t.me/noraphillip'),
+  ('prediction_type', 'number');
 ");
 
 echo '<h2 style=\"font-family:sans-serif;color:green;\">✓ Nora database installed successfully!</h2>';
