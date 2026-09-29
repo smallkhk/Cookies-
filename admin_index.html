@@ -401,6 +401,18 @@ select.filter:focus{border-color:var(--gold);}
             <input class="setting-input" type="text" id="cfg-deposit" placeholder="https://t.me/noraphillip" onchange="saveCfg('banner_url',this.value.trim())">
           </div>
           <div class="setting-row">
+            <div class="setting-info"><p class="setting-label">Price (INR)</p><p class="setting-desc">The "INR &#8377;" amount shown in the app overlay / deposit prompt</p></div>
+            <input class="setting-input" type="text" id="cfg-price" placeholder="900" onchange="saveCfg('register_amount',this.value.trim())">
+          </div>
+          <div class="setting-row">
+            <div class="setting-info"><p class="setting-label">1 Week Price (INR)</p><p class="setting-desc">Amount shown for the 1-week plan</p></div>
+            <input class="setting-input" type="text" id="cfg-price1w" placeholder="450" onchange="saveCfg('1week_amount',this.value.trim())">
+          </div>
+          <div class="setting-row">
+            <div class="setting-info"><p class="setting-label">2 Week Price (INR)</p><p class="setting-desc">Amount shown for the 2-week plan</p></div>
+            <input class="setting-input" type="text" id="cfg-price2w" placeholder="900" onchange="saveCfg('2week_amount',this.value.trim())">
+          </div>
+          <div class="setting-row">
             <div class="setting-info"><p class="setting-label">App Version</p><p class="setting-desc">Shown on the about screen</p></div>
             <input class="setting-input" type="text" id="cfg-version" placeholder="1.0.0" onchange="saveCfg('app_version',this.value.trim())">
           </div>
@@ -950,6 +962,9 @@ async function loadSettings() {
   document.getElementById('cfg-override').value       = c.signal_override || '';
   document.getElementById('cfg-predtype').value       = c.prediction_type || 'number';
   document.getElementById('cfg-deposit').value        = c.banner_url || '';
+  document.getElementById('cfg-price').value          = c.register_amount || '';
+  document.getElementById('cfg-price1w').value        = c['1week_amount'] || '';
+  document.getElementById('cfg-price2w').value        = c['2week_amount'] || '';
   document.getElementById('cfg-version').value        = c.app_version || '1.0.0';
 }
 
