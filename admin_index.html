@@ -384,6 +384,10 @@ select.filter:focus{border-color:var(--gold);}
             <label class="toggle"><input type="checkbox" id="tog-reg" checked onchange="saveCfg('registration_open',this.checked?'1':'0')"><span class="toggle-track"></span></label>
           </div>
           <div class="setting-row">
+            <div class="setting-info"><p class="setting-label">AI Tool Active</p><p class="setting-desc">ON = predictions run. OFF = forces the in-app "Deposit Fund" gate</p></div>
+            <label class="toggle"><input type="checkbox" id="tog-ai" checked onchange="saveCfg('floating',this.checked?'':'true')"><span class="toggle-track"></span></label>
+          </div>
+          <div class="setting-row">
             <div class="setting-info"><p class="setting-label">Prediction Type</p><p class="setting-desc">What the prediction shows: Number (0-9), Color (RED/GREEN/VIOLET), Size (BIG/SMALL), or Mixed</p></div>
             <select class="setting-input" id="cfg-predtype" onchange="saveCfg('prediction_type',this.value)">
               <option value="number">Number (0-9)</option>
@@ -959,6 +963,7 @@ async function loadSettings() {
   const c = res.config;
   document.getElementById('tog-maintenance').checked = c.maintenance_mode === '1';
   document.getElementById('tog-reg').checked          = c.registration_open !== '0';
+  document.getElementById('tog-ai').checked           = (c.floating || '') !== 'true';
   document.getElementById('cfg-override').value       = c.signal_override || '';
   document.getElementById('cfg-predtype').value       = c.prediction_type || 'number';
   document.getElementById('cfg-deposit').value        = c.banner_url || '';
