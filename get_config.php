@@ -18,7 +18,7 @@ json_out([
     'status'          => 'success',
     'server'          => $server,
     'maintenance'     => $maintenance,
-    'floating'        => isset($cfg['floating']) ? $cfg['floating'] : 'true',
+    'floating'        => isset($cfg['floating']) ? $cfg['floating'] : 'false',
     'telegram'        => isset($cfg['telegram_url']) ? $cfg['telegram_url']
                          : (isset($cfg['telegram_handle']) ? $cfg['telegram_handle'] : ''),
     'register_amount' => isset($cfg['register_amount']) ? $cfg['register_amount'] : '450',
