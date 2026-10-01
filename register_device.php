@@ -58,7 +58,7 @@ $token    = bin2hex(random_bytes(20));
 $stmt = $db->prepare(
     "INSERT INTO users (username, password, device_id, token, plan, signal_limit, balance, status) VALUES (?,?,?,?,?,?,?,?)"
 );
-$stmt->execute([$username, password_hash($token, PASSWORD_DEFAULT), $device_id, $token, 'Starter', 50, 0, 'active']);
+$stmt->execute([$username, password_hash($token, PASSWORD_DEFAULT), $device_id, $token, 'Starter', 5, 0, 'active']);
 $userId = $db->lastInsertId();
 
 log_activity($db, 'register', "Device auto-registered: {$username} ({$device_id})", $userId);
@@ -66,5 +66,5 @@ log_activity($db, 'register', "Device auto-registered: {$username} ({$device_id}
 json_out([
     'status'   => 'success',
     'username' => $username,
-    'limit'    => '50',
+    'limit'    => '5',
 ]);
