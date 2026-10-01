@@ -68,7 +68,22 @@ if ($override !== '') {
     $prediction = pick_number();
 }
 
-// Consume one prediction from the user's limit.
+// The app calls this endpoint on every button tap and only afterwards decides
+// whether to show CHANGE (AI on) or DEPOSIT (AI off / floating=true). So only
+// charge the user when AI is active; a deposit-mode tap must NOT reduce limit.
+$fl  = $db->query("SELECT cfg_value FROM app_config WHERE cfg_key='floating'")->fetch();
+$depositMode = $fl && trim((string)$fl['cfg_value']) === 'true';
+
+if ($depositMode) {
+    // Deposit gate showing - return current limit, do not consume.
+    json_out([
+        'status'     => 'success',
+        'prediction' => $prediction,
+        'limit_left' => (string)$user['signal_limit'],
+    ]);
+}
+
+// Consume one prediction from the user's limit (real prediction / change).
 $db->prepare("UPDATE users SET signal_limit = signal_limit - 1 WHERE id = ?")->execute([$user['id']]);
 $left = max(0, (int)$user['signal_limit'] - 1);
 
