@@ -1,7 +1,7 @@
 <?php
-require_once __DIR__ . '/../db.php';
+require_once __DIR__ . '/db.php';
 session_start();
-if (empty($_SESSION['nora_admin'])) { json_out(['status'=>'error','message'=>'Unauthorized'], 401); }
+if (empty($_SESSION['admin'])) { json_out(array('status'=>'error','message'=>'Unauthorized'), 401); }
 
 $db = getDB();
 
