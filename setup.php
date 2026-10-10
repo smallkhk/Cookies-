@@ -447,4 +447,154 @@ require_once __DIR__ . '/admin_products.php';
 NOWDOC_END_PRODUCTS_PHP
 );
 echo "OK: products.php<br>";
+
+// ── User/ endpoints ──────────────────────────────────────────────────────────
+@mkdir(__DIR__."/User", 0755, true);
+
+file_put_contents(__DIR__."/User/con.php", <<<'NOWDOC_END_CON_PHP'
+<?php
+require_once __DIR__ . '/../db.php';
+cors();
+
+$sign = post('sign');
+if (!$sign) {
+    json_out(['message' => 'Sign Missing']);
+}
+
+json_out(['message' => 'Server Connected']);
+NOWDOC_END_CON_PHP
+);
+echo "OK: User/con.php<br>";
+
+file_put_contents(__DIR__."/User/login.php", <<<'NOWDOC_END_LOGIN_PHP'
+<?php
+require_once __DIR__ . '/../db.php';
+cors();
+
+$phone    = post('phone');
+$password = post('password');
+
+if (!$phone || !$password) {
+    json_out(['message' => 'Phone and password required']);
+}
+
+$db   = getDB();
+$stmt = $db->prepare("SELECT * FROM vrx_users WHERE phone = ? AND password = ? LIMIT 1");
+$stmt->execute([$phone, $password]);
+$user = $stmt->fetch();
+
+if (!$user) {
+    json_out(['message' => 'Invalid phone or password']);
+}
+
+json_out([
+    'message' => 'Login successful',
+    'user'    => ['name' => $user['name']],
+]);
+NOWDOC_END_LOGIN_PHP
+);
+echo "OK: User/login.php<br>";
+
+file_put_contents(__DIR__."/User/register.php", <<<'NOWDOC_END_REGISTER_PHP'
+<?php
+require_once __DIR__ . '/../db.php';
+cors();
+
+$name     = post('name');
+$phone    = post('phone');
+$password = post('password');
+
+if (!$name || !$phone || !$password) {
+    json_out(['message' => 'All fields required']);
+}
+
+$db = getDB();
+$db->exec("
+CREATE TABLE IF NOT EXISTS vrx_users (
+    id       INT AUTO_INCREMENT PRIMARY KEY,
+    name     VARCHAR(100) NOT NULL,
+    phone    VARCHAR(30) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    created  DATETIME DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+");
+
+$check = $db->prepare("SELECT id FROM vrx_users WHERE phone = ? LIMIT 1");
+$check->execute([$phone]);
+if ($check->fetch()) {
+    json_out(['message' => 'Phone already registered']);
+}
+
+$db->prepare("INSERT INTO vrx_users (name, phone, password) VALUES (?, ?, ?)")
+   ->execute([$name, $phone, $password]);
+
+json_out([
+    'message' => 'Registered successfully',
+    'user'    => ['name' => $name],
+]);
+NOWDOC_END_REGISTER_PHP
+);
+echo "OK: User/register.php<br>";
+
+file_put_contents(__DIR__."/User/get_items.php", <<<'NOWDOC_END_GET_ITEMS_PHP'
+<?php
+require_once __DIR__ . '/../db.php';
+cors();
+
+$db = getDB();
+$db->exec("
+CREATE TABLE IF NOT EXISTS vrx_items (
+    id     INT AUTO_INCREMENT PRIMARY KEY,
+    name   VARCHAR(120) NOT NULL,
+    image  VARCHAR(255) DEFAULT '',
+    link   TEXT,
+    sort   INT DEFAULT 0,
+    active TINYINT(1) DEFAULT 1
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+");
+
+$rows = $db->query("SELECT name, image, link FROM vrx_items WHERE active = 1 ORDER BY sort ASC, id ASC")->fetchAll();
+echo json_encode($rows);
+NOWDOC_END_GET_ITEMS_PHP
+);
+echo "OK: User/get_items.php<br>";
+
+file_put_contents(__DIR__."/User/ge_f_data.php", <<<'NOWDOC_END_GE_F_DATA_PHP'
+<?php
+require_once __DIR__ . '/../db.php';
+cors();
+
+json_out(['status' => 'true']);
+NOWDOC_END_GE_F_DATA_PHP
+);
+echo "OK: User/ge_f_data.php<br>";
+
+// ── AdminService/ endpoints ──────────────────────────────────────────────────
+@mkdir(__DIR__."/AdminService", 0755, true);
+@mkdir(__DIR__."/AdminService/uploads", 0755, true);
+
+file_put_contents(__DIR__."/AdminService/get_main_product.php", <<<'NOWDOC_END_MAIN_PRODUCT_PHP'
+<?php
+require_once __DIR__ . '/../db.php';
+cors();
+
+$db = getDB();
+$db->exec("
+CREATE TABLE IF NOT EXISTS vrx_main_product (
+    id    INT AUTO_INCREMENT PRIMARY KEY,
+    name  VARCHAR(120) NOT NULL,
+    image VARCHAR(255) DEFAULT '',
+    link  TEXT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+");
+
+$row = $db->query("SELECT name, image, link FROM vrx_main_product ORDER BY id DESC LIMIT 1")->fetch();
+if (!$row) {
+    $row = ['name' => 'VRX STORE', 'image' => '', 'link' => ''];
+}
+json_out($row);
+NOWDOC_END_MAIN_PRODUCT_PHP
+);
+echo "OK: AdminService/get_main_product.php<br>";
+
 echo "<br><strong>Done! Delete setup.php now.</strong>";
