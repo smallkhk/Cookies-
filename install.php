@@ -88,6 +88,5 @@ INSERT IGNORE INTO app_config (cfg_key, cfg_value) VALUES
   ('prediction_type', 'number');
 ");
 
-echo '<h2 style=\"font-family:sans-serif;color:green;\">✓ Nora database installed successfully!</h2>';
-echo '<p style=\"font-family:sans-serif;\">You can now delete <strong>install.php</strong> from your server.</p>';
-echo '<p style=\"font-family:sans-serif;\"><a href=\"admin/\">→ Open Admin Panel</a></p>';
+echo '<h2 style="font-family:sans-serif;color:green;">Database installed successfully!</h2>';
+echo '<p style="font-family:sans-serif;">You can now delete <strong>install.php</strong> from your server.</p>';
