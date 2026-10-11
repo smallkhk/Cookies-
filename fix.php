@@ -25,7 +25,7 @@ $fixes = [
     "UPDATE plans SET price=300 WHERE name='Standard'",
     "ALTER TABLE vrx_users ADD COLUMN IF NOT EXISTS predictions_used INT DEFAULT 0",
     "ALTER TABLE vrx_users ADD COLUMN IF NOT EXISTS last_prediction_date DATE DEFAULT NULL",
-    "INSERT IGNORE INTO app_config (cfg_key, cfg_value) VALUES ('prediction_limit', '5'), ('floating', 'false'), ('telegram', '')",
+    "INSERT IGNORE INTO app_config (cfg_key, cfg_value) VALUES ('prediction_limit', '5'), ('floating', 'false'), ('telegram_url', ''), ('telegram_handle', '')",
     "INSERT IGNORE INTO app_config (cfg_key, cfg_value) VALUES ('banner_name', 'VRX STORE'), ('banner_image', ''), ('banner_url', '')",
 ];
 
