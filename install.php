@@ -66,7 +66,7 @@ INSERT IGNORE INTO products (id, name, image, url, sort) VALUES
 $db->exec("
 INSERT IGNORE INTO plans (name, signals, price, days, featured) VALUES
   ('Starter',   50,    450,  7,  0),
-  ('Standard',  100,   900,  14, 0),
+  ('Standard',  100,   300,  14, 0),
   ('Pro',       500,   1800, 30, 1),
   ('Unlimited', 99999, 4500, 30, 0);
 ");

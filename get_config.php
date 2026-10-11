@@ -23,6 +23,6 @@ json_out([
                          : (isset($cfg['telegram_handle']) ? $cfg['telegram_handle'] : ''),
     'register_amount' => isset($cfg['register_amount']) ? $cfg['register_amount'] : '450',
     '1week_amount'    => isset($cfg['1week_amount']) ? $cfg['1week_amount'] : '450',
-    '2week_amount'    => isset($cfg['2week_amount']) ? $cfg['2week_amount'] : '900',
+    '2week_amount'    => isset($cfg['2week_amount']) ? $cfg['2week_amount'] : '300',
     'app_version'     => isset($cfg['app_version']) ? $cfg['app_version'] : '1.0.0',
 ]);
