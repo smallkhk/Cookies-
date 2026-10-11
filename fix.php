@@ -9,6 +9,11 @@ if (($_GET['run'] ?? '') !== '1') {
 $db = getDB();
 
 $fixes = [
+    "CREATE TABLE IF NOT EXISTS app_config (
+        cfg_key    VARCHAR(80) PRIMARY KEY,
+        cfg_value  TEXT,
+        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4",
     "ALTER TABLE app_config ADD COLUMN IF NOT EXISTS updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP",
     "ALTER TABLE users ADD COLUMN IF NOT EXISTS created_at DATETIME DEFAULT CURRENT_TIMESTAMP",
     "ALTER TABLE users ADD COLUMN IF NOT EXISTS updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP",
@@ -21,6 +26,7 @@ $fixes = [
     "ALTER TABLE vrx_users ADD COLUMN IF NOT EXISTS predictions_used INT DEFAULT 0",
     "ALTER TABLE vrx_users ADD COLUMN IF NOT EXISTS last_prediction_date DATE DEFAULT NULL",
     "INSERT IGNORE INTO app_config (cfg_key, cfg_value) VALUES ('prediction_limit', '5'), ('floating', 'false'), ('telegram', '')",
+    "INSERT IGNORE INTO app_config (cfg_key, cfg_value) VALUES ('banner_name', 'VRX STORE'), ('banner_image', ''), ('banner_url', '')",
 ];
 
 foreach ($fixes as $sql) {
