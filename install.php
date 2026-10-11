@@ -85,7 +85,10 @@ INSERT IGNORE INTO app_config (cfg_key, cfg_value) VALUES
   ('banner_name', 'VEERGAME HACK'),
   ('banner_image', ''),
   ('banner_url', 'https://t.me/noraphillip'),
-  ('prediction_type', 'number');
+  ('prediction_type', 'number'),
+  ('register_amount', '300'),
+  ('1week_amount',    '450'),
+  ('2week_amount',    '300');
 ");
 
 echo '<h2 style="font-family:sans-serif;color:green;">Database installed successfully!</h2>';
