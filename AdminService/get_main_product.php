@@ -3,17 +3,16 @@ require_once __DIR__ . '/../db.php';
 cors();
 
 $db = getDB();
-$db->exec("
-CREATE TABLE IF NOT EXISTS vrx_main_product (
-    id    INT AUTO_INCREMENT PRIMARY KEY,
-    name  VARCHAR(120) NOT NULL,
-    image VARCHAR(255) DEFAULT '',
-    link  TEXT
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-");
 
-$row = $db->query("SELECT name, image, link FROM vrx_main_product ORDER BY id DESC LIMIT 1")->fetch();
-if (!$row) {
-    $row = ['name' => 'VRX STORE', 'image' => '', 'link' => ''];
-}
+// Read banner config saved by admin (keys: banner_name, banner_image, banner_url)
+$rows = $db->query("SELECT cfg_key, cfg_value FROM app_config WHERE cfg_key IN ('banner_name','banner_image','banner_url')")->fetchAll();
+$cfg = [];
+foreach ($rows as $r) { $cfg[$r['cfg_key']] = $r['cfg_value']; }
+
+$row = [
+    'name'  => $cfg['banner_name']  ?? 'VRX STORE',
+    'image' => $cfg['banner_image'] ?? '',
+    'link'  => $cfg['banner_url']   ?? '',
+];
+
 json_out($row);

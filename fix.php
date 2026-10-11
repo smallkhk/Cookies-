@@ -18,6 +18,9 @@ $fixes = [
        ('2week_amount',    '300')",
     "UPDATE app_config SET cfg_value='300' WHERE cfg_key='2week_amount'",
     "UPDATE plans SET price=300 WHERE name='Standard'",
+    "ALTER TABLE vrx_users ADD COLUMN IF NOT EXISTS predictions_used INT DEFAULT 0",
+    "ALTER TABLE vrx_users ADD COLUMN IF NOT EXISTS last_prediction_date DATE DEFAULT NULL",
+    "INSERT IGNORE INTO app_config (cfg_key, cfg_value) VALUES ('prediction_limit', '5'), ('floating', 'false'), ('telegram', '')",
 ];
 
 foreach ($fixes as $sql) {
