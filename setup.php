@@ -448,10 +448,13 @@ NOWDOC_END_PRODUCTS_PHP
 );
 echo "OK: products.php<br>";
 
-// ── User/ endpoints ──────────────────────────────────────────────────────────
-@mkdir(__DIR__."/User", 0755, true);
+// ── User/ and AdminService/ go in the VRX ROOT (parent of api/) ─────────────
+$root = __DIR__ . '/..';
 
-file_put_contents(__DIR__."/User/con.php", <<<'NOWDOC_END_CON_PHP'
+// ── User/ endpoints ──────────────────────────────────────────────────────────
+@mkdir($root."/User", 0755, true);
+
+file_put_contents($root."/User/con.php", <<<'NOWDOC_END_CON_PHP'
 <?php
 require_once __DIR__ . '/../db.php';
 cors();
@@ -466,7 +469,7 @@ NOWDOC_END_CON_PHP
 );
 echo "OK: User/con.php<br>";
 
-file_put_contents(__DIR__."/User/login.php", <<<'NOWDOC_END_LOGIN_PHP'
+file_put_contents($root."/User/login.php", <<<'NOWDOC_END_LOGIN_PHP'
 <?php
 require_once __DIR__ . '/../db.php';
 cors();
@@ -495,7 +498,7 @@ NOWDOC_END_LOGIN_PHP
 );
 echo "OK: User/login.php<br>";
 
-file_put_contents(__DIR__."/User/register.php", <<<'NOWDOC_END_REGISTER_PHP'
+file_put_contents($root."/User/register.php", <<<'NOWDOC_END_REGISTER_PHP'
 <?php
 require_once __DIR__ . '/../db.php';
 cors();
@@ -536,7 +539,7 @@ NOWDOC_END_REGISTER_PHP
 );
 echo "OK: User/register.php<br>";
 
-file_put_contents(__DIR__."/User/get_items.php", <<<'NOWDOC_END_GET_ITEMS_PHP'
+file_put_contents($root."/User/get_items.php", <<<'NOWDOC_END_GET_ITEMS_PHP'
 <?php
 require_once __DIR__ . '/../db.php';
 cors();
@@ -559,7 +562,7 @@ NOWDOC_END_GET_ITEMS_PHP
 );
 echo "OK: User/get_items.php<br>";
 
-file_put_contents(__DIR__."/User/ge_f_data.php", <<<'NOWDOC_END_GE_F_DATA_PHP'
+file_put_contents($root."/User/ge_f_data.php", <<<'NOWDOC_END_GE_F_DATA_PHP'
 <?php
 require_once __DIR__ . '/../db.php';
 cors();
@@ -570,10 +573,10 @@ NOWDOC_END_GE_F_DATA_PHP
 echo "OK: User/ge_f_data.php<br>";
 
 // ── AdminService/ endpoints ──────────────────────────────────────────────────
-@mkdir(__DIR__."/AdminService", 0755, true);
-@mkdir(__DIR__."/AdminService/uploads", 0755, true);
+@mkdir($root."/AdminService", 0755, true);
+@mkdir($root."/AdminService/uploads", 0755, true);
 
-file_put_contents(__DIR__."/AdminService/get_main_product.php", <<<'NOWDOC_END_MAIN_PRODUCT_PHP'
+file_put_contents($root."/AdminService/get_main_product.php", <<<'NOWDOC_END_MAIN_PRODUCT_PHP'
 <?php
 require_once __DIR__ . '/../db.php';
 cors();
