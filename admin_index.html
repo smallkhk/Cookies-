@@ -354,7 +354,8 @@ select.filter:focus{border-color:var(--gold);}
           <div class="card-header"><span class="card-title">Top Banner (get_main_product)</span></div>
           <div style="padding:16px 20px;display:grid;gap:12px;max-width:560px;">
             <label class="fld"><span>Banner name</span><input id="banner_name" placeholder="VEERGAME HACK"></label>
-            <label class="fld"><span>Banner image URL</span><input id="banner_image" placeholder="https://.../veergame.png"></label>
+            <label class="fld"><span>Banner image URL</span><input id="banner_image" placeholder="https://.../veergame.png" oninput="previewBanner(this.value)"></label>
+            <div id="banner-preview" style="display:none;margin-top:4px;"><img id="banner-preview-img" src="" alt="preview" style="max-width:200px;max-height:80px;border-radius:8px;border:1px solid var(--border);object-fit:contain;" onerror="document.getElementById('banner-preview').style.display='none'"></div>
             <label class="fld"><span>Banner activate URL</span><input id="banner_url" placeholder="https://www.veergame24.com"></label>
             <button class="btn btn-gold" style="justify-self:start;" onclick="saveBanner()">Save Banner</button>
           </div>
@@ -884,6 +885,7 @@ async function loadProducts() {
     document.getElementById('banner_name').value  = cfg.config.banner_name  || '';
     document.getElementById('banner_image').value = cfg.config.banner_image || '';
     document.getElementById('banner_url').value   = cfg.config.banner_url   || '';
+    previewBanner(cfg.config.banner_image || '');
   }
 }
 
@@ -930,6 +932,13 @@ async function deleteProduct(id) {
   if (!confirm('Delete this product?')) return;
   const res = await api('products.php', { action:'delete', id });
   if (res.status==='ok') { toast('Deleted','ok'); loadProducts(); }
+}
+
+function previewBanner(url) {
+  const wrap = document.getElementById('banner-preview');
+  const img  = document.getElementById('banner-preview-img');
+  if (url) { img.src = url; wrap.style.display = 'block'; }
+  else { wrap.style.display = 'none'; }
 }
 
 async function saveBanner() {
